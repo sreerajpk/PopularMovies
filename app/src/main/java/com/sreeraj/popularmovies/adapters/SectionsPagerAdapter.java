@@ -9,8 +9,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.sreeraj.popularmovies.fragments.PopularMovieListFragment;
-import com.sreeraj.popularmovies.fragments.TopRatedMovieListFragment;
+import com.sreeraj.popularmovies.app.Constants;
+import com.sreeraj.popularmovies.fragments.MovieListFragment;
 
 /**
  * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -30,9 +30,9 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         // Return a PlaceholderFragment (defined as a static inner class below).
         switch (position) {
             case 0:
-                return PopularMovieListFragment.newInstance();
+                return MovieListFragment.newInstance(Constants.POPULAR);
             case 1:
-                return TopRatedMovieListFragment.newInstance();
+                return MovieListFragment.newInstance(Constants.TOP_RATED);
             default:
                 break;
         }

@@ -5,13 +5,18 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <!--Margins-->
-    <dimen name="margin_xs">5dp</dimen>
+    <dimen name="margin_xs">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
 
     <!--Height-->
     <dimen name="height_xs">5dp</dimen>
 
     <!--Padding-->
+    <dimen name="padding_small">8dp</dimen>
     <dimen name="padding_medium">16dp</dimen>
     <dimen name="spacing">1dp</dimen>
+
+    <!--Text-->
+    <dimen name="text_medium">15sp</dimen>
 
 </resources>

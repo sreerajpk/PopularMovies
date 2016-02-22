@@ -87,6 +87,11 @@ public class Movie implements Parcelable {
         return video;
     }
 
+    public String getVoteAverage() {
+        return voteAverage;
+    }
+
+
     public Movie() {
 
     }
@@ -106,6 +111,7 @@ public class Movie implements Parcelable {
         voteCount = source.readInt();
         popularity = source.readDouble();
         video = (source.readInt() != 0);
+        voteAverage = source.readString();
     }
 
     @Override
@@ -123,6 +129,7 @@ public class Movie implements Parcelable {
         dest.writeInt(voteCount);
         dest.writeDouble(popularity);
         dest.writeInt(video ? 1 : 0);
+        dest.writeString(voteAverage);
     }
 
     public static final Parcelable.Creator<Movie> CREATOR

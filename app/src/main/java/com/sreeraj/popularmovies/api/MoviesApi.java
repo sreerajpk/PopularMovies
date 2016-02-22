@@ -2,9 +2,9 @@ package com.sreeraj.popularmovies.api;
 
 import com.sreeraj.popularmovies.R;
 import com.sreeraj.popularmovies.api.response.MovieListResponseBean;
+import com.sreeraj.popularmovies.app.Constants;
 import com.sreeraj.popularmovies.events.FailureEvent;
-import com.sreeraj.popularmovies.events.PopularMoviesEvent;
-import com.sreeraj.popularmovies.events.TopRatedMoviesEvent;
+import com.sreeraj.popularmovies.events.MoviesEvent;
 
 import java.util.Map;
 
@@ -23,7 +23,7 @@ public class MoviesApi extends BaseApi {
         call.enqueue(new Callback<MovieListResponseBean>() {
             @Override
             public void onResponse(Call<MovieListResponseBean> call, Response<MovieListResponseBean> response) {
-                EventBus.getDefault().post(new PopularMoviesEvent(response.body()));
+                EventBus.getDefault().post(new MoviesEvent(Constants.POPULAR, response.body()));
             }
 
             @Override
@@ -38,7 +38,7 @@ public class MoviesApi extends BaseApi {
         call.enqueue(new Callback<MovieListResponseBean>() {
             @Override
             public void onResponse(Call<MovieListResponseBean> call, Response<MovieListResponseBean> response) {
-                EventBus.getDefault().post(new TopRatedMoviesEvent(response.body()));
+                EventBus.getDefault().post(new MoviesEvent(Constants.TOP_RATED, response.body()));
             }
 
             @Override
@@ -47,34 +47,4 @@ public class MoviesApi extends BaseApi {
             }
         });
     }
-
-    /*public void getNextPagePopularMovies(String apiKey, int currentPage) {
-        Call<MovieListResponseBean> call = service.getTopRatedMovies(apiKey);
-        call.enqueue(new Callback<MovieListResponseBean>() {
-            @Override
-            public void onResponse(Call<MovieListResponseBean> call, Response<MovieListResponseBean> response) {
-                EventBus.getDefault().post(new PopularMoviesEvent(response.body()));
-            }
-
-            @Override
-            public void onFailure(Call<MovieListResponseBean> call, Throwable t) {
-                EventBus.getDefault().post(new FailureEvent(R.string.some_unknown_error_has_occurred));
-            }
-        });
-    }
-
-    public void getNextPageTopRatedMovies(String apiKey) {
-        Call<MovieListResponseBean> call = service.getTopRatedMovies(apiKey);
-        call.enqueue(new Callback<MovieListResponseBean>() {
-            @Override
-            public void onResponse(Call<MovieListResponseBean> call, Response<MovieListResponseBean> response) {
-                EventBus.getDefault().post(new TopRatedMoviesEvent(response.body()));
-            }
-
-            @Override
-            public void onFailure(Call<MovieListResponseBean> call, Throwable t) {
-                EventBus.getDefault().post(new FailureEvent(R.string.some_unknown_error_has_occurred));
-            }
-        });
-    }*/
 }

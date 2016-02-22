@@ -10,7 +10,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar_layout"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.CollapsingToolbarLayout
@@ -18,10 +18,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"
+            app:collapsedTitleTextAppearance="@style/collapsed_app_bar"
             app:contentScrim="@color/colorPrimary"
             app:expandedTitleMarginBottom="32dp"
             app:expandedTitleMarginEnd="64dp"
             app:expandedTitleMarginStart="20dp"
+            app:expandedTitleTextAppearance="@style/expanded_app_bar"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -29,7 +31,7 @@
             <ImageView
                 android:id="@+id/poster_image"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="280dp"
                 android:contentDescription="@null"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
@@ -62,23 +64,70 @@
 
                 <ImageView
                     android:id="@+id/thumb_image"
-                    android:layout_width="75dp"
-                    android:layout_height="100dp"
+                    android:layout_width="100dp"
+                    android:layout_height="150dp"
                     android:contentDescription="@null"
                     android:scaleType="fitXY"
                     android:transitionName="thumb_image"/>
 
-                <android.support.v7.widget.AppCompatRatingBar
+                <TextView
+                    android:id="@+id/user_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/margin_medium"
+                    android:layout_toRightOf="@+id/thumb_image"
+                    android:drawableLeft="@drawable/ic_star"
+                    android:drawablePadding="@dimen/padding_small"
+                    android:gravity="center"/>
+
+                <TextView
+                    android:id="@+id/vote_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/user_rating"
+                    android:layout_marginLeft="@dimen/margin_medium"
+                    android:layout_marginTop="@dimen/margin_medium"
                     android:layout_toRightOf="@+id/thumb_image"
-                    android:numStars="10"
-                    android:rating="0"/>
+                    android:drawableLeft="@drawable/ic_people"
+                    android:drawablePadding="@dimen/padding_small"/>
+
+                <TextView
+                    android:id="@+id/release_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/vote_count"
+                    android:layout_marginLeft="@dimen/margin_medium"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_toRightOf="@+id/thumb_image"
+                    android:text="@string/release_date"/>
+
+                <TextView
+                    android:id="@+id/release_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/vote_count"
+                    android:layout_marginLeft="@dimen/margin_xs"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_toRightOf="@+id/release_label"/>
+
             </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/spacing"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:background="@color/darker_gray"/>
+
+            <TextView
+                android:id="@+id/synopsis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:textSize="@dimen/text_medium"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="1000dp"/>
+                android:layout_height="200dp"/>
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

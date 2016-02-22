@@ -24,9 +24,11 @@ public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.Vi
 
     private List<Movie> movieList;
     private Context context;
+    private int movieListSortType;
 
-    public MoviesGridAdapter(Context context) {
+    public MoviesGridAdapter(Context context, int movieListSortType) {
         this.context = context;
+        this.movieListSortType = movieListSortType;
     }
 
     public void setList(List<Movie> movieList) {
@@ -76,7 +78,7 @@ public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.Vi
         @Override
         public void onClick(View v) {
             MoviesSelectionEvent event = new MoviesSelectionEvent(movieList.get(getLayoutPosition()),
-                    v.findViewById(R.id.movie_image));
+                    v.findViewById(R.id.movie_image), movieListSortType);
             EventBus.getDefault().post(event);
         }
     }

@@ -11,6 +11,7 @@ public class MoviesSelectionEvent {
 
     private Movie selectedMovie;
     private View view;
+    private int movieListSortType;
 
     public Movie getSelectedMovie() {
         return selectedMovie;
@@ -20,8 +21,13 @@ public class MoviesSelectionEvent {
         return view;
     }
 
-    public MoviesSelectionEvent(Movie selectedMovie, View view) {
+    public int getMovieListSortType() {
+        return movieListSortType;
+    }
+
+    public MoviesSelectionEvent(Movie selectedMovie, View view, int movieListSortType) {
         this.selectedMovie = selectedMovie;
         this.view = view;
+        this.movieListSortType = movieListSortType;
     }
 }

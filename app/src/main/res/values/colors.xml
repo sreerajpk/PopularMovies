@@ -6,4 +6,7 @@
 
     <color name="lighter_gray">#BDBDBD</color>
     <color name="darker_gray">#757575</color>
+
+    <color name="transparent_progress_dialog">#80000000</color>
+
 </resources>
