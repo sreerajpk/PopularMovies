@@ -25,30 +25,35 @@ import com.sreeraj.popularmovies.app.Constants;
 import com.sreeraj.popularmovies.events.FailureEvent;
 import com.sreeraj.popularmovies.events.MoviesEvent;
 import com.sreeraj.popularmovies.events.MoviesSelectionEvent;
-import com.sreeraj.popularmovies.models.Movie;
+import com.sreeraj.popularmovies.models.MovieInList;
 import com.sreeraj.popularmovies.utils.Utils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
 
 /**
- * Fragment which handles popular movielist.
+ * Fragment which handles movielist.
  */
 public class MovieListFragment extends Fragment {
 
     private static final String THUMB_IMAGE_TRANSITION_NAME = "thumb_image";
 
     private Context context;
-    private RecyclerView moviesGrid;
     private MoviesGridAdapter adapter;
     private GridLayoutManager layoutManager;
-    private View emptyView;
-    private List<Movie> movieList;
+    private List<MovieInList> movieList;
     private Dialog progressDialog;
     private int position;
+
+    @Bind(R.id.movies_grid)
+    RecyclerView moviesGrid;
+    @Bind(R.id.empty_view)
+    View emptyView;
 
     public static MovieListFragment newInstance(int position) {
         MovieListFragment fragment = new MovieListFragment();
@@ -57,7 +62,6 @@ public class MovieListFragment extends Fragment {
         fragment.setArguments(bundle);
         return fragment;
     }
-
 
     public MovieListFragment() {
         //Required empty constructor
@@ -76,18 +80,20 @@ public class MovieListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_movie_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_movie_list, container, false);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initViews(view);
+        ButterKnife.bind(getActivity());
+        initViews();
         fetchMovieList();
     }
 
-    private void initViews(View view) {
-        moviesGrid = (RecyclerView) view.findViewById(R.id.movies_grid);
+    private void initViews() {
         layoutManager = new GridLayoutManager(context, 2);
         moviesGrid.setLayoutManager(layoutManager);
         adapter = new MoviesGridAdapter(context, position);
@@ -102,7 +108,6 @@ public class MovieListFragment extends Fragment {
         moviesGrid.addItemDecoration(new SpacesItemDecoration(spacingInPixels));
         moviesGrid.setHasFixedSize(true);
         moviesGrid.setAdapter(adapter);
-        emptyView = view.findViewById(R.id.empty_view);
         emptyView.setVisibility(View.VISIBLE);
     }
 

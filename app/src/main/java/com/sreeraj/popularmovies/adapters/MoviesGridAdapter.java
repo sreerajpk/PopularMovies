@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.sreeraj.popularmovies.R;
 import com.sreeraj.popularmovies.events.MoviesSelectionEvent;
-import com.sreeraj.popularmovies.models.Movie;
+import com.sreeraj.popularmovies.models.MovieInList;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ import de.greenrobot.event.EventBus;
  */
 public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.ViewHolder> {
 
-    private List<Movie> movieList;
+    private List<MovieInList> movieList;
     private Context context;
     private int movieListSortType;
 
@@ -31,12 +31,12 @@ public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.Vi
         this.movieListSortType = movieListSortType;
     }
 
-    public void setList(List<Movie> movieList) {
+    public void setList(List<MovieInList> movieList) {
         this.movieList = movieList;
         notifyDataSetChanged();
     }
 
-    public void addMoviesToList(List<Movie> movieList) {
+    public void addMoviesToList(List<MovieInList> movieList) {
         int size = getItemCount();
         this.movieList.addAll(movieList);
         notifyItemRangeInserted(size, size + movieList.size() - 1);

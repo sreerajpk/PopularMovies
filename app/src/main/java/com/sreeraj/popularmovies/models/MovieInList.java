@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Sreeraj on 2/17/16.
  */
-public class Movie implements Parcelable {
+public class MovieInList implements Parcelable {
     @SerializedName("poster_path")
     private String posterPath;
     private boolean adult;
@@ -92,11 +92,11 @@ public class Movie implements Parcelable {
     }
 
 
-    public Movie() {
+    public MovieInList() {
 
     }
 
-    public Movie(Parcel source) {
+    public MovieInList(Parcel source) {
         posterPath = source.readString();
         adult = (source.readInt() != 0);
         overview = source.readString();
@@ -132,14 +132,14 @@ public class Movie implements Parcelable {
         dest.writeString(voteAverage);
     }
 
-    public static final Parcelable.Creator<Movie> CREATOR
-            = new Parcelable.Creator<Movie>() {
-        public Movie createFromParcel(Parcel source) {
-            return new Movie(source);
+    public static final Parcelable.Creator<MovieInList> CREATOR
+            = new Parcelable.Creator<MovieInList>() {
+        public MovieInList createFromParcel(Parcel source) {
+            return new MovieInList(source);
         }
 
-        public Movie[] newArray(int size) {
-            return new Movie[size];
+        public MovieInList[] newArray(int size) {
+            return new MovieInList[size];
         }
     };
 

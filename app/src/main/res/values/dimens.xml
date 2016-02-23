@@ -9,7 +9,7 @@
     <dimen name="margin_medium">16dp</dimen>
 
     <!--Height-->
-    <dimen name="height_xs">5dp</dimen>
+    <dimen name="height_xs">4dp</dimen>
 
     <!--Padding-->
     <dimen name="padding_small">8dp</dimen>

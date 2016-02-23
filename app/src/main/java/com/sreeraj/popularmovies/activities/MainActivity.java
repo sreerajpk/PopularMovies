@@ -9,32 +9,38 @@ import android.support.v7.widget.Toolbar;
 import com.sreeraj.popularmovies.R;
 import com.sreeraj.popularmovies.adapters.SectionsPagerAdapter;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * The main activity
  */
 
 public class MainActivity extends AppCompatActivity {
 
+    @Bind(R.id.container)
+    ViewPager mViewPager;
+    @Bind(R.id.tab_layout)
+    TabLayout tabLayout;
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        ButterKnife.bind(this);
         setViews();
     }
 
     private void setViews() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Create the adapter that will return a fragment for each of the t
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
-        ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         // Setup the Tabs
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        //tabLayout.setTabsFromPagerAdapter(mSectionsPagerAdapter);
         tabLayout.setupWithViewPager(mViewPager);
     }
 }

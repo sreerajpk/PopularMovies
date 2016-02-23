@@ -12,7 +12,7 @@
         android:layout_centerVertical="true"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/ic_launcher"
         android:transitionName="thumb_image"/>
 
     <TextView
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:background="#AA000000"
+        android:background="@color/light_transparent_text_background"
         android:gravity="center"
         android:padding="@dimen/margin_xs"
         android:text="Title"
