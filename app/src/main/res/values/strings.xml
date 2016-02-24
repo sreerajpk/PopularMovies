@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <!--YOUR_API_KEY_HERE-->
-    <string name="api_key">a780e4ca292bd0d419c740b86d62b4ea</string>
+    <string name="api_key">YOUR_API_KEY_HERE</string>
 
     <string name="some_unknown_error_has_occurred">Some unknown error has occurred</string>
 
