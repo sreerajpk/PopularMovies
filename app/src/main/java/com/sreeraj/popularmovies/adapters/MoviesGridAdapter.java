@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.sreeraj.popularmovies.R;
+import com.sreeraj.popularmovies.app.Constants;
 import com.sreeraj.popularmovies.events.MoviesSelectionEvent;
 import com.sreeraj.popularmovies.models.MovieInList;
 
@@ -50,7 +51,7 @@ public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Glide.with(context).load("http://image.tmdb.org/t/p/w500" +
+        Glide.with(context).load(Constants.IMAGE_BASE_URL +
                 movieList.get(position).getPosterPath()).placeholder(R.color.lighter_gray).into(holder.image);
         holder.name.setText(movieList.get(position).getTitle());
     }

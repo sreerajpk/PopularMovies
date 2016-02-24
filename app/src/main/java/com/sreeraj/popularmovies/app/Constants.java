@@ -6,6 +6,7 @@ package com.sreeraj.popularmovies.app;
 public class Constants {
 
     public static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
+    public static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w500";
     public static final String API_KEY = "api_key";
     public static final int POPULAR = 1;
     public static final int TOP_RATED = 2;

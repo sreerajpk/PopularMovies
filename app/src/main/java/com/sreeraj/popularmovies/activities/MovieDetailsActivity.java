@@ -48,7 +48,6 @@ import de.greenrobot.event.EventBus;
 public class MovieDetailsActivity extends AppCompatActivity {
 
     private static final double COLOR_DARKENING_FRACTION = 0.85;
-    private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w500";
     private static final String RATING_OUT_OF = "/10";
     private static final String MOVIE_POSTER = "movie_poster";
     private static final int SHORT_ANIMATION_DURATION = 200;
@@ -110,7 +109,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private void setData(final MovieInList movie) {
         if (movie != null) {
             if (movie.getBackdropPath() != null && !movie.getBackdropPath().isEmpty()) {
-                Glide.with(this).load(IMAGE_BASE_URL + movie.getBackdropPath())
+                Glide.with(this).load(Constants.IMAGE_BASE_URL + movie.getBackdropPath())
                         .asBitmap()
                         .placeholder(R.color.lighter_gray)
                         .listener(new RequestListener<String, Bitmap>() {
@@ -138,12 +137,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
             if (movie.getPosterPath() != null && !movie.getPosterPath().isEmpty()) {
                 final String posterPath = movie.getPosterPath();
-                Glide.with(this).load(IMAGE_BASE_URL
+                Glide.with(this).load(Constants.IMAGE_BASE_URL
                         + posterPath).placeholder(R.color.lighter_gray).into(thumbImage);
                 thumbImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final DialogFragment moviePosterDialog = MoviePosterDialogFragment.newInstance(IMAGE_BASE_URL
+                        final DialogFragment moviePosterDialog = MoviePosterDialogFragment.newInstance(Constants.IMAGE_BASE_URL
                                 + posterPath, movie.getOriginalTitle());
                         moviePosterDialog.show(getSupportFragmentManager(), MOVIE_POSTER);
                     }
