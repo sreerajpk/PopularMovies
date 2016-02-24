@@ -22,7 +22,7 @@
             app:contentScrim="@color/colorPrimary"
             app:expandedTitleMarginBottom="32dp"
             app:expandedTitleMarginEnd="64dp"
-            app:expandedTitleMarginStart="20dp"
+            app:expandedTitleMarginStart="@dimen/margin_medium"
             app:expandedTitleTextAppearance="@style/expanded_app_bar"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
@@ -43,13 +43,14 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
                 app:layout_collapseMode="pin"/>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:scrollbars="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -111,6 +112,51 @@
                     android:layout_marginTop="@dimen/margin_medium"
                     android:layout_toRightOf="@+id/release_label"/>
 
+                <TextView
+                    android:id="@+id/genre_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/release_date"
+                    android:layout_marginLeft="@dimen/margin_medium"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_toRightOf="@+id/thumb_image"
+                    android:text="@string/genre"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/genre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/release_date"
+                    android:layout_marginLeft="@dimen/margin_xs"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:layout_toRightOf="@+id/genre_label"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/tagline_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:visibility="gone">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/spacing"
+                    android:background="@color/darker_gray"/>
+
+                <TextView
+                    android:id="@+id/tagline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_medium"
+                    android:gravity="center"
+                    android:paddingLeft="@dimen/margin_xs"
+                    android:paddingRight="@dimen/margin_xs"
+                    android:textSize="@dimen/text_large"
+                    android:textStyle="italic"/>
+
             </RelativeLayout>
 
             <View
@@ -125,10 +171,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_medium"
                 android:textSize="@dimen/text_medium"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="200dp"/>
 
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

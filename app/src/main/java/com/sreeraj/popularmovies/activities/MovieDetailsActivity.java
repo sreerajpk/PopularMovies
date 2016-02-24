@@ -1,6 +1,7 @@
 package com.sreeraj.popularmovies.activities;
 
 import android.animation.Animator;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -20,18 +21,29 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.sreeraj.popularmovies.R;
+import com.sreeraj.popularmovies.api.MoviesApi;
 import com.sreeraj.popularmovies.app.Constants;
+import com.sreeraj.popularmovies.events.FailureEvent;
 import com.sreeraj.popularmovies.fragments.MoviePosterDialogFragment;
+import com.sreeraj.popularmovies.models.Genre;
+import com.sreeraj.popularmovies.models.Movie;
 import com.sreeraj.popularmovies.models.MovieInList;
+import com.sreeraj.popularmovies.utils.Utils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.greenrobot.event.EventBus;
+
+/**
+ * The activity which shows the details of a particular movie.
+ */
 
 public class MovieDetailsActivity extends AppCompatActivity {
 
@@ -40,6 +52,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private static final String RATING_OUT_OF = "/10";
     private static final String MOVIE_POSTER = "movie_poster";
     private static final int SHORT_ANIMATION_DURATION = 200;
+    private static final String DOUBLE_QUOTES = "\"";
+
+    private MovieInList movie;
+    private Dialog progressDialog;
 
     @Bind(R.id.poster_image)
     ImageView posterImage;
@@ -57,6 +73,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
     TextView releaseDate;
     @Bind(R.id.toolbar)
     Toolbar toolbar;
+    @Bind(R.id.genre)
+    TextView genre;
+    @Bind(R.id.genre_label)
+    TextView genreLabel;
+    @Bind(R.id.tagline)
+    TextView tagline;
+    @Bind(R.id.tagline_layout)
+    RelativeLayout taglineLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,19 +92,24 @@ public class MovieDetailsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        MovieInList movie = new MovieInList();
+        movie = new MovieInList();
         if (getIntent() != null) {
             Intent intent = getIntent();
             Bundle bundle = intent.getBundleExtra(Constants.BUNDLE);
             movie = bundle.getParcelable(Constants.MOVIE);
         }
         setData(movie);
-        setSharedElementTransition();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setSharedElementTransition();
+        } else {
+            posterImage.setVisibility(View.VISIBLE);
+            fetchMovieDetails();
+        }
     }
 
     private void setData(final MovieInList movie) {
         if (movie != null) {
-            if (movie.getBackdropPath() != null) {
+            if (movie.getBackdropPath() != null && !movie.getBackdropPath().isEmpty()) {
                 Glide.with(this).load(IMAGE_BASE_URL + movie.getBackdropPath())
                         .asBitmap()
                         .placeholder(R.color.lighter_gray)
@@ -107,7 +136,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             if (movie.getOriginalTitle() != null && getSupportActionBar() != null) {
                 getSupportActionBar().setTitle(movie.getOriginalTitle());
             }
-            if (movie.getPosterPath() != null) {
+            if (movie.getPosterPath() != null && !movie.getPosterPath().isEmpty()) {
                 final String posterPath = movie.getPosterPath();
                 Glide.with(this).load(IMAGE_BASE_URL
                         + posterPath).placeholder(R.color.lighter_gray).into(thumbImage);
@@ -117,18 +146,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
                         final DialogFragment moviePosterDialog = MoviePosterDialogFragment.newInstance(IMAGE_BASE_URL
                                 + posterPath, movie.getOriginalTitle());
                         moviePosterDialog.show(getSupportFragmentManager(), MOVIE_POSTER);
-                        //getWindow().setExitTransition(new Explode());
                     }
                 });
             }
-            if (movie.getOverview() != null) {
+            if (movie.getOverview() != null && !movie.getOverview().isEmpty()) {
                 synopsis.setText(movie.getOverview());
             }
-            if (movie.getVoteAverage() != null) {
-                userRating.setText(movie.getVoteAverage() + RATING_OUT_OF);
-            }
+            userRating.setText(movie.getVoteAverage() + RATING_OUT_OF);
             voteCount.setText(String.valueOf(movie.getVoteCount()));
-            if (movie.getReleaseDate() != null) {
+            if (movie.getReleaseDate() != null && !movie.getReleaseDate().isEmpty()) {
                 releaseDate.setText(movie.getReleaseDate());
             }
         }
@@ -154,36 +180,34 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
     private void setSharedElementTransition() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Transition transition = TransitionInflater.from(this).inflateTransition(R.transition.change_bounds_with_arc_motion);
-            getWindow().setSharedElementEnterTransition(transition);
-            transition.addListener(new Transition.TransitionListener() {
-                @Override
-                public void onTransitionStart(Transition transition) {
+        Transition transition = TransitionInflater.from(this).inflateTransition(R.transition.change_bounds_with_arc_motion);
+        getWindow().setSharedElementEnterTransition(transition);
+        transition.addListener(new Transition.TransitionListener() {
+            @Override
+            public void onTransitionStart(Transition transition) {
 
-                }
+            }
 
-                @Override
-                public void onTransitionEnd(Transition transition) {
-                    animateRevealShow();
-                }
+            @Override
+            public void onTransitionEnd(Transition transition) {
+                animateRevealShow();
+            }
 
-                @Override
-                public void onTransitionCancel(Transition transition) {
+            @Override
+            public void onTransitionCancel(Transition transition) {
 
-                }
+            }
 
-                @Override
-                public void onTransitionPause(Transition transition) {
+            @Override
+            public void onTransitionPause(Transition transition) {
 
-                }
+            }
 
-                @Override
-                public void onTransitionResume(Transition transition) {
+            @Override
+            public void onTransitionResume(Transition transition) {
 
-                }
-            });
-        }
+            }
+        });
     }
 
     private void animateRevealShow() {
@@ -196,14 +220,67 @@ public class MovieDetailsActivity extends AppCompatActivity {
         anim.setDuration(SHORT_ANIMATION_DURATION);
         anim.setInterpolator(new AccelerateInterpolator());
         anim.start();
+        fetchMovieDetails();
+    }
+
+    private void fetchMovieDetails() {
+        if (Utils.isNetworkAvailable(this)) {
+            MoviesApi moviesApi = new MoviesApi();
+            moviesApi.getMovieDetails(movie.getId(), getString(R.string.api_key));
+        }
+    }
+
+    public void onEvent(Movie movie) {
+        if (this.movie.getId() == movie.getId()) {
+            setMovieDetails(movie);
+        }
+    }
+
+    private void setMovieDetails(Movie movie) {
+        if (movie.getGenres() != null) {
+            StringBuilder builder = new StringBuilder();
+            for (Genre genre : movie.getGenres()) {
+                if (!(builder.toString().isEmpty())) {
+                    builder.append(", ");
+                }
+                builder.append(genre.getName());
+            }
+            genreLabel.setVisibility(View.VISIBLE);
+            genre.setText(builder.toString());
+        }
+        if (movie.getTagline() != null && !movie.getTagline().isEmpty()) {
+            tagline.setVisibility(View.VISIBLE);
+            String tag = "";
+            tag = tag.concat(DOUBLE_QUOTES).concat(movie.getTagline()).concat(DOUBLE_QUOTES);
+            tagline.setText(tag);
+            taglineLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void onEvent(FailureEvent failureEvent) {
+        Utils.showToast(failureEvent.getFailureMessageId(), this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().registerSticky(this);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            // Respond to the action bar's Up/Home button
             supportFinishAfterTransition();
-            //onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);

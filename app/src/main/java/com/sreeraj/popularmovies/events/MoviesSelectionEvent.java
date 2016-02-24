@@ -5,7 +5,7 @@ import android.view.View;
 import com.sreeraj.popularmovies.models.MovieInList;
 
 /**
- * Created by Sreeraj on 2/19/16.
+ * Events which handles movie selection from grid.
  */
 public class MoviesSelectionEvent {
 

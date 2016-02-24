@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 /**
- * Created by Sreeraj on 2/18/16.
+ * ItemDecoration for Recylcerview with grid of Movies.
  */
 public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
     private int space;

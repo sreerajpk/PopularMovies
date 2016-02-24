@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Sreeraj on 2/17/16.
+ * Model object for movies retrieved as a list.
  */
 public class MovieInList implements Parcelable {
     @SerializedName("poster_path")
@@ -33,7 +33,7 @@ public class MovieInList implements Parcelable {
     private int voteCount;
     private boolean video;
     @SerializedName("vote_average")
-    private String voteAverage;
+    private double voteAverage;
 
     public String getPosterPath() {
         return posterPath;
@@ -87,7 +87,7 @@ public class MovieInList implements Parcelable {
         return video;
     }
 
-    public String getVoteAverage() {
+    public double getVoteAverage() {
         return voteAverage;
     }
 
@@ -111,7 +111,7 @@ public class MovieInList implements Parcelable {
         voteCount = source.readInt();
         popularity = source.readDouble();
         video = (source.readInt() != 0);
-        voteAverage = source.readString();
+        voteAverage = source.readDouble();
     }
 
     @Override
@@ -129,7 +129,7 @@ public class MovieInList implements Parcelable {
         dest.writeInt(voteCount);
         dest.writeDouble(popularity);
         dest.writeInt(video ? 1 : 0);
-        dest.writeString(voteAverage);
+        dest.writeDouble(voteAverage);
     }
 
     public static final Parcelable.Creator<MovieInList> CREATOR

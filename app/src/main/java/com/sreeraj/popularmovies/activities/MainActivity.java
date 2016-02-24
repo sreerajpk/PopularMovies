@@ -13,7 +13,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * The main activity
+ * The main activity.
  */
 
 public class MainActivity extends AppCompatActivity {
@@ -35,12 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setViews() {
         setSupportActionBar(toolbar);
-
-        // Create the adapter that will return a fragment for each of the t
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        // Set up the ViewPager with the sections adapter.
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        // Setup the Tabs
         tabLayout.setupWithViewPager(mViewPager);
     }
 }

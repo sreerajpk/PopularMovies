@@ -6,7 +6,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Created by neeraj on 20/1/16.
+ * Base Api.
  */
 public class BaseApi {
 

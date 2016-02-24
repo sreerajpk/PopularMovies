@@ -18,7 +18,7 @@ import java.util.List;
 import de.greenrobot.event.EventBus;
 
 /**
- * Created by Sreeraj on 2/17/16.
+ * Adapter that populates movie list.
  */
 public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.ViewHolder> {
 

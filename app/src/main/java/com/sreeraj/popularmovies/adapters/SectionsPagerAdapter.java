@@ -6,14 +6,13 @@ package com.sreeraj.popularmovies.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.sreeraj.popularmovies.app.Constants;
 import com.sreeraj.popularmovies.fragments.MovieListFragment;
 
 /**
- * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+ * A FragmentStatePagerAdapter that returns a fragment corresponding to
  * one of the sections/tabs/pages.
  */
 public class SectionsPagerAdapter extends FragmentStatePagerAdapter {

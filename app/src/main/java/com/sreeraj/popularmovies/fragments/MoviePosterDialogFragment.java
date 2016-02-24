@@ -18,14 +18,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * Created by Sreeraj on 2/23/16.
+ * Fragment which shows a large poster image and title of the movie.
  */
 public class MoviePosterDialogFragment extends DialogFragment {
 
     private static final String URL = "url";
     private static final String TITLE = "title";
 
-    private View view;
     @Bind(R.id.dialog_poster_image)
     ImageView posterImage;
     @Bind(R.id.movie_title)
@@ -52,29 +51,16 @@ public class MoviePosterDialogFragment extends DialogFragment {
             url = bundle.getString(URL);
             title = bundle.getString(TITLE);
         }
-        view = inflater.inflate(R.layout.movie_poster_dialog_fragment, container, false);
+        View view = inflater.inflate(R.layout.movie_poster_dialog_fragment, container, false);
         ButterKnife.bind(this, view);
-        Glide.with(getActivity()).load(url).into(posterImage);
-        movieTitle.setText(title);
-//        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//
-//            @Override
-//            public void onGlobalLayout() {
-//                int cx = view.getLeft();
-//                int cy = view.getTop();
-//                //int cy = (view.getTop() + view.getBottom()) / 2;
-//
-//                int startradius = 0;
-//                int endradius = Math.max(view.getWidth(), view.getHeight());
-//
-//                Animator animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, startradius, endradius);
-//                animator.setInterpolator(new AccelerateDecelerateInterpolator());
-//                animator.setDuration(400);
-//                animator.start();
-//            }
-//        });
+
+        if (url != null && !url.isEmpty()) {
+            Glide.with(getActivity()).load(url).thumbnail(0.3f).into(posterImage);
+        }
+        if (title != null && !title.isEmpty()) {
+            movieTitle.setText(title);
+        }
         return view;
     }
-
 }
 

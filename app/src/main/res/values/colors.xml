@@ -8,6 +8,6 @@
     <color name="darker_gray">#757575</color>
     <color name="light_transparent_text_background">#AA000000</color>
 
-    <color name="transparent_progress_dialog">#80000000</color>
+    <color name="transparent_progress_dialog">#AA000000</color>
 
 </resources>

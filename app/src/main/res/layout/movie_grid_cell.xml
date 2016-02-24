@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?android:selectableItemBackground"
                 android:gravity="center"
                 android:orientation="vertical">
 
@@ -12,7 +13,6 @@
         android:layout_centerVertical="true"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_launcher"
         android:transitionName="thumb_image"/>
 
     <TextView
@@ -23,7 +23,6 @@
         android:background="@color/light_transparent_text_background"
         android:gravity="center"
         android:padding="@dimen/margin_xs"
-        android:text="Title"
         android:textColor="@android:color/white"/>
 
 </RelativeLayout>

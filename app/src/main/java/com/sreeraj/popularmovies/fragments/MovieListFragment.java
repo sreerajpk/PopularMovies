@@ -1,6 +1,5 @@
 package com.sreeraj.popularmovies.fragments;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -8,13 +7,15 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.sreeraj.popularmovies.R;
 import com.sreeraj.popularmovies.SpacesItemDecoration;
@@ -39,7 +40,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Fragment which handles movielist.
  */
-public class MovieListFragment extends Fragment {
+public class MovieListFragment extends BaseFragment {
 
     private static final String THUMB_IMAGE_TRANSITION_NAME = "thumb_image";
 
@@ -47,13 +48,17 @@ public class MovieListFragment extends Fragment {
     private MoviesGridAdapter adapter;
     private GridLayoutManager layoutManager;
     private List<MovieInList> movieList;
-    private Dialog progressDialog;
     private int position;
+    private boolean refresh;
 
     @Bind(R.id.movies_grid)
     RecyclerView moviesGrid;
     @Bind(R.id.empty_view)
-    View emptyView;
+    LinearLayout emptyView;
+    @Bind(R.id.retry_button)
+    Button retryButton;
+    @Bind(R.id.swipe_refresh_layout)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     public static MovieListFragment newInstance(int position) {
         MovieListFragment fragment = new MovieListFragment();
@@ -108,7 +113,19 @@ public class MovieListFragment extends Fragment {
         moviesGrid.addItemDecoration(new SpacesItemDecoration(spacingInPixels));
         moviesGrid.setHasFixedSize(true);
         moviesGrid.setAdapter(adapter);
-        emptyView.setVisibility(View.VISIBLE);
+        retryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fetchMovieList();
+            }
+        });
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh = true;
+                fetchMovieList();
+            }
+        });
     }
 
     private void checkAdapterIsEmpty() {
@@ -121,7 +138,9 @@ public class MovieListFragment extends Fragment {
 
     private void fetchMovieList() {
         if (Utils.isNetworkAvailable(context)) {
-            progressDialog = Utils.showProgressDialog(context);
+            if (!refresh) {
+                showProgressDialog(context);
+            }
             MoviesApi moviesApi = new MoviesApi();
             Map<String, String> options = new HashMap<>();
             options.put(Constants.API_KEY, getString(R.string.api_key));
@@ -132,6 +151,15 @@ public class MovieListFragment extends Fragment {
             }
         } else {
             showNetworkAlertSnackBar();
+            emptyView.setVisibility(View.VISIBLE);
+            stopRefreshing();
+        }
+    }
+
+    private void stopRefreshing() {
+        if (refresh) {
+            refresh = false;
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -156,30 +184,36 @@ public class MovieListFragment extends Fragment {
             movieList = event.getResponseBean().getResults();
             adapter.setList(movieList);
             hideProgressDialog();
+            stopRefreshing();
+            if (apiCallsInProgress == 0) { //If all api call results are delivered as sticky
+                EventBus.getDefault().removeStickyEvent(event);
+            }
         }
     }
 
     public void onEvent(FailureEvent failureEvent) {
         hideProgressDialog();
+        stopRefreshing();
         Utils.showToast(failureEvent.getFailureMessageId(), context);
-    }
-
-    private void hideProgressDialog() {
-        if (progressDialog.isShowing()) {
-            progressDialog.dismiss();
+        if (apiCallsInProgress == 0) { //If all api call results are delivered as sticky
+            EventBus.getDefault().removeStickyEvent(failureEvent);
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        EventBus.getDefault().register(this);
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().registerSticky(this);
+        }
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        EventBus.getDefault().unregister(this);
+    public void onStop() {
+        super.onStop();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
     }
 
     private void showNetworkAlertSnackBar() {

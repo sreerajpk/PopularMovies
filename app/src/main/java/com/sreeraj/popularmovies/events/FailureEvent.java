@@ -1,7 +1,7 @@
 package com.sreeraj.popularmovies.events;
 
 /**
- * Created by Sreeraj on 1/27/16.
+ * Event which handles failure of api calls.
  */
 public class FailureEvent {
 
