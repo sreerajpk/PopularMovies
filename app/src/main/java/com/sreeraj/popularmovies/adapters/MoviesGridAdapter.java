@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -22,7 +23,10 @@ import de.greenrobot.event.EventBus;
 /**
  * Adapter that populates movie list.
  */
-public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.ViewHolder> {
+public class MoviesGridAdapter extends RecyclerView.Adapter {
+
+    public static final int VIEW_ITEM = 1;
+    public static final int VIEW_PROG = 0;
 
     private List<MovieGeneral> movieList = new ArrayList<>();
     private Context context;
@@ -45,32 +49,59 @@ public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.Vi
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.movie_grid_cell, parent, false);
-        return new ViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        RecyclerView.ViewHolder holder;
+        if (viewType == VIEW_ITEM) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(
+                    R.layout.movie_grid_cell, parent, false);
+            holder = new MovieViewHolder(view);
+        } else {
+            View view = LayoutInflater.from(parent.getContext()).inflate(
+                    R.layout.dialog_borderless, parent, false);
+            holder = new ProgressViewHolder(view);
+        }
+        return holder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Glide.with(context).load(Constants.IMAGE_BASE_URL
-                + movieList.get(position).getPosterPath()).placeholder(R.color.lighter_gray).into(holder.image);
-        holder.name.setText(movieList.get(position).getTitle());
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
+        if (holder instanceof MovieViewHolder) {
+            Glide.with(context).load(Constants.IMAGE_BASE_URL
+                    + movieList.get(position).getPosterPath()).placeholder(R.color.lighter_gray).into(((MovieViewHolder) holder).image);
+            ((MovieViewHolder) holder).name.setText(movieList.get(position).getTitle());
+        } else {
+            ((ProgressViewHolder) holder).progressBar.setIndeterminate(true);
+        }
     }
 
     @Override
     public int getItemCount() {
-        if (movieList == null) {
+        if (movieList.size() == 0) {
             return 0;
         }
-        return movieList.size();
+        return movieList.size() + 1;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    @Override
+    public int getItemViewType(int position) {
+        if (movieList.size() > 0) {
+            if (position < movieList.size()) {
+                return VIEW_ITEM;
+            } else {
+                return VIEW_PROG;
+            }
+        }
+        return 1;
+    }
+
+
+    public class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ImageView image;
         private TextView name;
 
-        public ViewHolder(View itemView) {
+        public MovieViewHolder(View itemView) {
             super(itemView);
             image = (ImageView) itemView.findViewById(R.id.movie_image);
             name = (TextView) itemView.findViewById(R.id.movie_title);
@@ -84,4 +115,14 @@ public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.Vi
             EventBus.getDefault().post(event);
         }
     }
+
+    public class ProgressViewHolder extends RecyclerView.ViewHolder {
+        public ProgressBar progressBar;
+
+        public ProgressViewHolder(View v) {
+            super(v);
+            progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
+        }
+    }
+
 }

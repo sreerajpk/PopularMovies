@@ -49,13 +49,14 @@ import de.greenrobot.event.EventBus;
  */
 public class MovieListFragment extends Fragment {
 
-    public static final int PAGE_SIZE = 20;
     private static final String THUMB_IMAGE_TRANSITION_NAME = "thumb_image";
     private static final String POSITION = "position";
     private static final String MOVIE_LIST = "movie_list";
     private static final String CURRENT_PAGE = "current_page";
     private static final String TOTAL_PAGES = "total_pages";
-    private static int apiCallsInProgress = 0;
+    private static final int MOVIE_ITEM_SIZE = 1;
+    private static final int PROGRESS_ITEM_SIZE = 2;
+
     @Bind(R.id.movies_grid)
     RecyclerView moviesGrid;
     @Bind(R.id.empty_view)
@@ -163,8 +164,21 @@ public class MovieListFragment extends Fragment {
 
     private void initViews() {
         layoutManager = new GridLayoutManager(context, getResources().getInteger(R.integer.number_of_columns));
-        moviesGrid.setLayoutManager(layoutManager);
         adapter = new MoviesGridAdapter(context, position);
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                switch (adapter.getItemViewType(position)) {
+                    case MoviesGridAdapter.VIEW_ITEM:
+                        return MOVIE_ITEM_SIZE;
+                    case MoviesGridAdapter.VIEW_PROG:
+                        return PROGRESS_ITEM_SIZE;
+                    default:
+                        return -1;
+                }
+            }
+        });
+        moviesGrid.setLayoutManager(layoutManager);
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
@@ -187,7 +201,6 @@ public class MovieListFragment extends Fragment {
 
     private void loadMoreItems() {
         isLoading = true;
-        apiCallsInProgress++;
         MoviesApi moviesApi = new MoviesApi();
         Map<String, String> options = new HashMap<>();
         options.put(Constants.API_KEY, getString(R.string.api_key));
@@ -214,7 +227,6 @@ public class MovieListFragment extends Fragment {
             MoviesApi moviesApi = new MoviesApi();
             Map<String, String> options = new HashMap<>();
             options.put(Constants.API_KEY, getString(R.string.api_key));
-            apiCallsInProgress++;
             if (position == Constants.POPULAR) {
                 moviesApi.getPopularMovies(options);
             } else {
@@ -253,7 +265,6 @@ public class MovieListFragment extends Fragment {
     }
 
     private void setMovieList(MovieListResponseBean bean) {
-        apiCallsInProgress--;
         List<MovieGeneral> list = bean.getResults();
         if (adapter.getItemCount() == 0) {
             movieList = list;
@@ -280,12 +291,9 @@ public class MovieListFragment extends Fragment {
     }
 
     public void onEvent(FailureEvent failureEvent) {
-        apiCallsInProgress--;
         progressBar.setVisibility(View.GONE);
         Utils.showToast(failureEvent.getFailureMessageId(), context);
-        if (apiCallsInProgress == 0) { //If all api call results are delivered as sticky
-            EventBus.getDefault().removeStickyEvent(failureEvent);
-        }
+        EventBus.getDefault().removeStickyEvent(failureEvent);
         isLoading = false;
         checkAdapterIsEmpty();
     }
