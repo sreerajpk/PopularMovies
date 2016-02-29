@@ -1,7 +1,7 @@
 package com.sreeraj.popularmovies.api.response;
 
 import com.google.gson.annotations.SerializedName;
-import com.sreeraj.popularmovies.models.MovieInList;
+import com.sreeraj.popularmovies.models.MovieGeneral;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class MovieListResponseBean {
     private int page;
-    private List<MovieInList> results;
+    private List<MovieGeneral> results;
     @SerializedName("total_results")
     private int totalResults;
     @SerializedName("total_pages")
@@ -20,7 +20,7 @@ public class MovieListResponseBean {
         return page;
     }
 
-    public List<MovieInList> getResults() {
+    public List<MovieGeneral> getResults() {
         return results;
     }
 

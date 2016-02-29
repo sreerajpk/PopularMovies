@@ -18,10 +18,10 @@ import retrofit2.http.QueryMap;
 public interface WebService {
 
     @GET("popular")
-    Call<MovieListResponseBean> getPopularMovies(@QueryMap Map<String, String> options);//@Query("api_key") String apiKey, @Query("page") int pageToBeFetched);
+    Call<MovieListResponseBean> getPopularMovies(@QueryMap Map<String, String> options);
 
     @GET("top_rated")
-    Call<MovieListResponseBean> getTopRatedMovies(@QueryMap Map<String, String> options);//@Query("api_key") String apiKey, @Query("page") int pageToBeFetched);
+    Call<MovieListResponseBean> getTopRatedMovies(@QueryMap Map<String, String> options);
 
     @GET("{id}")
     Call<Movie> getMovieDetails(@Path("id") int id, @Query("api_key") String apiKey);

@@ -12,8 +12,9 @@ import com.bumptech.glide.Glide;
 import com.sreeraj.popularmovies.R;
 import com.sreeraj.popularmovies.app.Constants;
 import com.sreeraj.popularmovies.events.MoviesSelectionEvent;
-import com.sreeraj.popularmovies.models.MovieInList;
+import com.sreeraj.popularmovies.models.MovieGeneral;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -23,7 +24,7 @@ import de.greenrobot.event.EventBus;
  */
 public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.ViewHolder> {
 
-    private List<MovieInList> movieList;
+    private List<MovieGeneral> movieList = new ArrayList<>();
     private Context context;
     private int movieListSortType;
 
@@ -32,12 +33,12 @@ public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.Vi
         this.movieListSortType = movieListSortType;
     }
 
-    public void setList(List<MovieInList> movieList) {
-        this.movieList = movieList;
+    public void setList(List<MovieGeneral> movieList) {
+        this.movieList.addAll(movieList);
         notifyDataSetChanged();
     }
 
-    public void addMoviesToList(List<MovieInList> movieList) {
+    public void addMoviesToList(List<MovieGeneral> movieList) {
         int size = getItemCount();
         this.movieList.addAll(movieList);
         notifyItemRangeInserted(size, size + movieList.size() - 1);
@@ -51,8 +52,8 @@ public class MoviesGridAdapter extends RecyclerView.Adapter<MoviesGridAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Glide.with(context).load(Constants.IMAGE_BASE_URL +
-                movieList.get(position).getPosterPath()).placeholder(R.color.lighter_gray).into(holder.image);
+        Glide.with(context).load(Constants.IMAGE_BASE_URL
+                + movieList.get(position).getPosterPath()).placeholder(R.color.lighter_gray).into(holder.image);
         holder.name.setText(movieList.get(position).getTitle());
     }
 

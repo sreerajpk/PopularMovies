@@ -2,44 +2,49 @@ package com.sreeraj.popularmovies.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+
 import java.util.List;
 
 /**
  * Model object for Movie details fetched individually.
  */
+@Parcel
 public class Movie {
 
-    private boolean adult;
+    public boolean adult;
     @SerializedName("backdrop_path")
-    private String backdropPath;
-    private String budget;
-    private List<Genre> genres;
-    private String homepage;
-    private int id;
+    public String backdropPath;
+    public String budget;
+    public List<Genre> genres;
+    public String homepage;
+    public int id;
     @SerializedName("imdb_id")
-    private String imdbId;
+    public String imdbId;
     @SerializedName("original_language")
-    private String originalLanguage;
+    public String originalLanguage;
     @SerializedName("original_title")
-    private String originalTitle;
-    private String overview;
-    private double popularity;
+    public String originalTitle;
+    public String overview;
+    public double popularity;
     @SerializedName("poster_path")
-    private String posterPath;
-
-
+    public String posterPath;
     @SerializedName("release_date")
-    private String releaseDate;
-    private String revenue;
-    private int runtime;
-    private String status;
-    private String tagline;
-    private String title;
-    private boolean video;
+    public String releaseDate;
+    public String revenue;
+    public int runtime;
+    public String status;
+    public String tagline;
+    public String title;
+    public boolean video;
     @SerializedName("vote_average")
-    private double voteAverage;
+    public double voteAverage;
     @SerializedName("vote_count")
-    private int voteCount;
+    public int voteCount;
+
+    public Movie() {
+        // Empty constructor required for parceler
+    }
 
     public boolean isAdult() {
         return adult;

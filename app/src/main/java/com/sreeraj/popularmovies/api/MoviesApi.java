@@ -2,9 +2,9 @@ package com.sreeraj.popularmovies.api;
 
 import com.sreeraj.popularmovies.R;
 import com.sreeraj.popularmovies.api.response.MovieListResponseBean;
-import com.sreeraj.popularmovies.app.Constants;
 import com.sreeraj.popularmovies.events.FailureEvent;
-import com.sreeraj.popularmovies.events.MoviesEvent;
+import com.sreeraj.popularmovies.events.PopularMoviesEvent;
+import com.sreeraj.popularmovies.events.TopRatedMoviesEvent;
 import com.sreeraj.popularmovies.models.Movie;
 
 import java.util.Map;
@@ -24,7 +24,7 @@ public class MoviesApi extends BaseApi {
         call.enqueue(new Callback<MovieListResponseBean>() {
             @Override
             public void onResponse(Call<MovieListResponseBean> call, Response<MovieListResponseBean> response) {
-                EventBus.getDefault().postSticky(new MoviesEvent(Constants.POPULAR, response.body()));
+                EventBus.getDefault().postSticky(new PopularMoviesEvent(response.body()));
             }
 
             @Override
@@ -39,7 +39,7 @@ public class MoviesApi extends BaseApi {
         call.enqueue(new Callback<MovieListResponseBean>() {
             @Override
             public void onResponse(Call<MovieListResponseBean> call, Response<MovieListResponseBean> response) {
-                EventBus.getDefault().postSticky(new MoviesEvent(Constants.TOP_RATED, response.body()));
+                EventBus.getDefault().postSticky(new TopRatedMoviesEvent(response.body()));
             }
 
             @Override

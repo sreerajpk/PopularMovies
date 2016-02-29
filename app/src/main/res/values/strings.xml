@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <!--YOUR_API_KEY_HERE-->
-    <string name="api_key">YOUR_API_KEY_HERE</string>
+    <string name="api_key">a780e4ca292bd0d419c740b86d62b4ea</string>
 
     <string name="some_unknown_error_has_occurred">Some unknown error has occurred</string>
 
@@ -13,5 +13,9 @@
     <string name="release_date">Release date:</string>
     <string name="genre">Genre:</string>
     <string name="retry_button">Retry</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

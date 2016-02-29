@@ -1,13 +1,13 @@
 package com.sreeraj.popularmovies.activities;
 
 import android.animation.Animator;
-import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -34,15 +34,17 @@ import com.sreeraj.popularmovies.events.FailureEvent;
 import com.sreeraj.popularmovies.fragments.MoviePosterDialogFragment;
 import com.sreeraj.popularmovies.models.Genre;
 import com.sreeraj.popularmovies.models.Movie;
-import com.sreeraj.popularmovies.models.MovieInList;
+import com.sreeraj.popularmovies.models.MovieGeneral;
 import com.sreeraj.popularmovies.utils.Utils;
+
+import org.parceler.Parcels;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import de.greenrobot.event.EventBus;
 
 /**
- * The activity which shows the details of a particular movie.
+ * The activity which shows the details of a particular movieGeneral.
  */
 
 public class MovieDetailsActivity extends AppCompatActivity {
@@ -52,10 +54,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private static final String MOVIE_POSTER = "movie_poster";
     private static final int SHORT_ANIMATION_DURATION = 200;
     private static final String DOUBLE_QUOTES = "\"";
-
-    private MovieInList movie;
-    private Dialog progressDialog;
-
+    private static final String MOVIE = "movie";
     @Bind(R.id.poster_image)
     ImageView posterImage;
     @Bind(R.id.collapsing_toolbar)
@@ -80,6 +79,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
     TextView tagline;
     @Bind(R.id.tagline_layout)
     RelativeLayout taglineLayout;
+    @Bind(R.id.fab)
+    FloatingActionButton fab;
+    private MovieGeneral movieGeneral;
+    private Movie movie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,25 +94,40 @@ public class MovieDetailsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        movie = new MovieInList();
+        movieGeneral = new MovieGeneral();
         if (getIntent() != null) {
             Intent intent = getIntent();
             Bundle bundle = intent.getBundleExtra(Constants.BUNDLE);
-            movie = bundle.getParcelable(Constants.MOVIE);
+            movieGeneral = Parcels.unwrap(bundle.getParcelable(Constants.MOVIE_GENERAL));
         }
-        setData(movie);
+        if (savedInstanceState != null) {
+            movieGeneral = Parcels.unwrap(savedInstanceState.getParcelable(Constants.MOVIE_GENERAL));
+            movie = Parcels.unwrap(savedInstanceState.getParcelable(MOVIE));
+            if (movie != null) {
+                setMovieDetails(movie);
+            }
+        }
+        setData();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setSharedElementTransition();
         } else {
             posterImage.setVisibility(View.VISIBLE);
             fetchMovieDetails();
         }
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fab.setSelected(!fab.isSelected());
+                movieGeneral.setIsFavourite(fab.isSelected());
+                // Code to store the favourite movies in db
+            }
+        });
     }
 
-    private void setData(final MovieInList movie) {
-        if (movie != null) {
-            if (movie.getBackdropPath() != null && !movie.getBackdropPath().isEmpty()) {
-                Glide.with(this).load(Constants.IMAGE_BASE_URL + movie.getBackdropPath())
+    private void setData() {
+        if (movieGeneral != null) {
+            if (movieGeneral.getBackdropPath() != null && !movieGeneral.getBackdropPath().isEmpty()) {
+                Glide.with(this).load(Constants.IMAGE_BASE_URL + movieGeneral.getBackdropPath())
                         .asBitmap()
                         .placeholder(R.color.lighter_gray)
                         .listener(new RequestListener<String, Bitmap>() {
@@ -120,6 +138,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
                             @Override
                             public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    animateRevealShow();
+                                }
                                 Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
 
                                     @Override
@@ -132,30 +153,31 @@ public class MovieDetailsActivity extends AppCompatActivity {
                         })
                         .into(posterImage);
             }
-            if (movie.getOriginalTitle() != null && getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(movie.getOriginalTitle());
+            if (movieGeneral.getOriginalTitle() != null && getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(movieGeneral.getOriginalTitle());
             }
-            if (movie.getPosterPath() != null && !movie.getPosterPath().isEmpty()) {
-                final String posterPath = movie.getPosterPath();
+            if (movieGeneral.getPosterPath() != null && !movieGeneral.getPosterPath().isEmpty()) {
+                final String posterPath = movieGeneral.getPosterPath();
                 Glide.with(this).load(Constants.IMAGE_BASE_URL
                         + posterPath).placeholder(R.color.lighter_gray).into(thumbImage);
                 thumbImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         final DialogFragment moviePosterDialog = MoviePosterDialogFragment.newInstance(Constants.IMAGE_BASE_URL
-                                + posterPath, movie.getOriginalTitle());
+                                + posterPath, movieGeneral.getOriginalTitle());
                         moviePosterDialog.show(getSupportFragmentManager(), MOVIE_POSTER);
                     }
                 });
             }
-            if (movie.getOverview() != null && !movie.getOverview().isEmpty()) {
-                synopsis.setText(movie.getOverview());
+            if (movieGeneral.getOverview() != null && !movieGeneral.getOverview().isEmpty()) {
+                synopsis.setText(movieGeneral.getOverview());
             }
-            userRating.setText(movie.getVoteAverage() + RATING_OUT_OF);
-            voteCount.setText(String.valueOf(movie.getVoteCount()));
-            if (movie.getReleaseDate() != null && !movie.getReleaseDate().isEmpty()) {
-                releaseDate.setText(movie.getReleaseDate());
+            userRating.setText(movieGeneral.getVoteAverage() + RATING_OUT_OF);
+            voteCount.setText(String.valueOf(movieGeneral.getVoteCount()));
+            if (movieGeneral.getReleaseDate() != null && !movieGeneral.getReleaseDate().isEmpty()) {
+                releaseDate.setText(movieGeneral.getReleaseDate());
             }
+            fab.setSelected(movieGeneral.isFavourite());
         }
     }
 
@@ -189,7 +211,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onTransitionEnd(Transition transition) {
-                animateRevealShow();
+                //animateRevealShow();
             }
 
             @Override
@@ -225,17 +247,19 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private void fetchMovieDetails() {
         if (Utils.isNetworkAvailable(this)) {
             MoviesApi moviesApi = new MoviesApi();
-            moviesApi.getMovieDetails(movie.getId(), getString(R.string.api_key));
+            moviesApi.getMovieDetails(movieGeneral.getId(), getString(R.string.api_key));
         }
     }
 
     public void onEvent(Movie movie) {
-        if (this.movie.getId() == movie.getId()) {
+        if (this.movieGeneral.getId() == movie.getId()) {
             setMovieDetails(movie);
         }
+        EventBus.getDefault().removeStickyEvent(movie);
     }
 
     private void setMovieDetails(Movie movie) {
+        this.movie = movie;
         if (movie.getGenres() != null) {
             StringBuilder builder = new StringBuilder();
             for (Genre genre : movie.getGenres()) {
@@ -257,7 +281,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
     public void onEvent(FailureEvent failureEvent) {
-        Utils.showToast(failureEvent.getFailureMessageId(), this);
+        //Utils.showToast(failureEvent.getFailureMessageId(), this);
+        EventBus.getDefault().removeStickyEvent(failureEvent);
     }
 
     @Override
@@ -275,6 +300,16 @@ public class MovieDetailsActivity extends AppCompatActivity {
             EventBus.getDefault().unregister(this);
         }
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(Constants.MOVIE_GENERAL, Parcels.wrap(movieGeneral));
+        if (movie != null) {
+            outState.putParcelable(MOVIE, Parcels.wrap(movie));
+        }
+        super.onSaveInstanceState(outState);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

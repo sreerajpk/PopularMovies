@@ -25,13 +25,15 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/white"
             app:layout_scrollFlags="scroll|snap"
             app:tabBackground="@android:color/white"
             app:tabGravity="fill"
+            app:tabIndicatorColor="@color/colorPrimary"
             app:tabIndicatorHeight="@dimen/height_xs"
+            app:tabMode="fixed"
             app:tabSelectedTextColor="@android:color/black"
-            app:tabTextColor="@color/darker_gray"
-            app:tabIndicatorColor="@color/colorPrimary"/>
+            app:tabTextColor="@color/darker_gray"/>
 
     </android.support.design.widget.AppBarLayout>
 
