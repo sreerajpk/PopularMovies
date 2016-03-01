@@ -1,0 +1,75 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:context="com.sreeraj.popularmovies.Main2Activity"
+                tools:showIn="@layout/activity_movie_details">
+
+    <ImageView
+        android:id="@+id/thumb_image"
+        android:layout_width="100dp"
+        android:layout_height="150dp"
+        android:contentDescription="@null"
+        android:scaleType="fitXY"
+        android:transitionName="thumb_image"/>
+
+    <TextView
+        android:id="@+id/user_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_medium"
+        android:layout_toRightOf="@+id/thumb_image"
+        android:drawableLeft="@drawable/ic_star"
+        android:drawablePadding="@dimen/padding_small"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/vote_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/user_rating"
+        android:layout_marginLeft="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_toRightOf="@+id/thumb_image"
+        android:drawableLeft="@drawable/ic_people"
+        android:drawablePadding="@dimen/padding_small"/>
+
+    <TextView
+        android:id="@+id/release_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/vote_count"
+        android:layout_marginLeft="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_toRightOf="@+id/thumb_image"
+        android:text="@string/release_date"/>
+
+    <TextView
+        android:id="@+id/release_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/vote_count"
+        android:layout_marginLeft="@dimen/margin_xs"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_toRightOf="@+id/release_label"/>
+
+    <TextView
+        android:id="@+id/genre_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/release_date"
+        android:layout_marginLeft="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_toRightOf="@+id/thumb_image"
+        android:text="@string/genre"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/genre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/release_date"
+        android:layout_marginLeft="@dimen/margin_xs"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_toRightOf="@+id/genre_label"/>
+</RelativeLayout>

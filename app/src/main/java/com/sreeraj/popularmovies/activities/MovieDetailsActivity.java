@@ -11,7 +11,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.view.MenuItem;
@@ -21,7 +23,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -29,12 +30,15 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.sreeraj.popularmovies.R;
 import com.sreeraj.popularmovies.api.MoviesApi;
+import com.sreeraj.popularmovies.api.VideoApi;
+import com.sreeraj.popularmovies.api.response.VideoResponseBean;
 import com.sreeraj.popularmovies.app.Constants;
 import com.sreeraj.popularmovies.events.FailureEvent;
 import com.sreeraj.popularmovies.fragments.MoviePosterDialogFragment;
 import com.sreeraj.popularmovies.models.Genre;
 import com.sreeraj.popularmovies.models.Movie;
 import com.sreeraj.popularmovies.models.MovieGeneral;
+import com.sreeraj.popularmovies.models.Video;
 import com.sreeraj.popularmovies.utils.Utils;
 
 import org.parceler.Parcels;
@@ -78,11 +82,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @Bind(R.id.tagline)
     TextView tagline;
     @Bind(R.id.tagline_layout)
-    RelativeLayout taglineLayout;
+    CardView taglineLayout;
+    @Bind(R.id.overview_card)
+    CardView overviewCard;
     @Bind(R.id.fab)
     FloatingActionButton fab;
     private MovieGeneral movieGeneral;
     private Movie movie;
+    private VideoResponseBean videoResponseBean;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,8 +178,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
             if (movieGeneral.getOverview() != null && !movieGeneral.getOverview().isEmpty()) {
                 synopsis.setText(movieGeneral.getOverview());
+                overviewCard.setVisibility(View.VISIBLE);
             }
-            userRating.setText(movieGeneral.getVoteAverage() + RATING_OUT_OF);
+            String ratingString = "<b>" + movieGeneral.getVoteAverage() + "</b> " + RATING_OUT_OF;
+            userRating.setText(Html.fromHtml(ratingString));
             voteCount.setText(String.valueOf(movieGeneral.getVoteCount()));
             if (movieGeneral.getReleaseDate() != null && !movieGeneral.getReleaseDate().isEmpty()) {
                 releaseDate.setText(movieGeneral.getReleaseDate());
@@ -248,6 +257,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
         if (Utils.isNetworkAvailable(this)) {
             MoviesApi moviesApi = new MoviesApi();
             moviesApi.getMovieDetails(movieGeneral.getId(), getString(R.string.api_key));
+
+            VideoApi videoApi = new VideoApi();
+            videoApi.getVideoDetails(movieGeneral.getId(), getString(R.string.api_key));
         }
     }
 
@@ -285,6 +297,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
         EventBus.getDefault().removeStickyEvent(failureEvent);
     }
 
+    public void onEvent(VideoResponseBean bean) {
+        if (this.movieGeneral.getId() == movie.getId()) {
+            setVideoDetails(bean);
+        }
+        EventBus.getDefault().removeStickyEvent(bean);
+    }
+
+    public void setVideoDetails(VideoResponseBean videoResponseBean) {
+        this.videoResponseBean = videoResponseBean;
+        for (Video video : videoResponseBean.getResults()) {
+
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -319,4 +345,5 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

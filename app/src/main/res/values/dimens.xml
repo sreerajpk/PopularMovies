@@ -18,6 +18,7 @@
 
     <!--Text-->
     <dimen name="text_medium">15sp</dimen>
+    <dimen name="text_heading">16sp</dimen>
     <dimen name="text_large">17sp</dimen>
 
 </resources>

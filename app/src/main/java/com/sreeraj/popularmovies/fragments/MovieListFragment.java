@@ -55,7 +55,6 @@ public class MovieListFragment extends Fragment {
     private static final String CURRENT_PAGE = "current_page";
     private static final String TOTAL_PAGES = "total_pages";
     private static final int MOVIE_ITEM_SIZE = 1;
-    private static final int PROGRESS_ITEM_SIZE = 2;
 
     @Bind(R.id.movies_grid)
     RecyclerView moviesGrid;
@@ -172,7 +171,7 @@ public class MovieListFragment extends Fragment {
                     case MoviesGridAdapter.VIEW_ITEM:
                         return MOVIE_ITEM_SIZE;
                     case MoviesGridAdapter.VIEW_PROG:
-                        return PROGRESS_ITEM_SIZE;
+                        return getResources().getInteger(R.integer.size_of_progress_pagination);
                     default:
                         return -1;
                 }

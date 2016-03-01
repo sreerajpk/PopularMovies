@@ -10,4 +10,6 @@
 
     <color name="transparent_progress_dialog">#AA000000</color>
 
+    <color name="background">#f1f1f1</color>
+
 </resources>

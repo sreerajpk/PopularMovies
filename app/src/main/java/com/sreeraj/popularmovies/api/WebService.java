@@ -2,6 +2,7 @@ package com.sreeraj.popularmovies.api;
 
 
 import com.sreeraj.popularmovies.api.response.MovieListResponseBean;
+import com.sreeraj.popularmovies.api.response.VideoResponseBean;
 import com.sreeraj.popularmovies.models.Movie;
 
 import java.util.Map;
@@ -25,4 +26,7 @@ public interface WebService {
 
     @GET("{id}")
     Call<Movie> getMovieDetails(@Path("id") int id, @Query("api_key") String apiKey);
+
+    @GET("{id}/videos")
+    Call<VideoResponseBean> getVideoDetails(@Path("id") int id, @Query("api_key") String apiKey);
 }

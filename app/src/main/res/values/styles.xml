@@ -5,11 +5,14 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:colorBackground">@color/background</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
@@ -26,4 +29,27 @@
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <style name="PopularMovies.Label" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">@dimen/text_heading</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+
+    </style>
+
+    <style name="PopularMovies.Text" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">@dimen/text_medium</item>
+        <item name="android:paddingLeft">@dimen/padding_small</item>
+        <item name="android:paddingRight">@dimen/padding_small</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+
+    <!--<style name="AppTheme.Translucent" parent="AppTheme.NoActionBar"/>-->
+
+    <!--<style name="TASupportCenters.Label.Light" parent="TextAppearance.AppCompat">-->
+    <!--<item name="android:textSize">@dimen/text_medium</item>-->
+    <!--<item name="android:textColor">@color/text_light</item>-->
+    <!--</style>-->
+
 </resources>
