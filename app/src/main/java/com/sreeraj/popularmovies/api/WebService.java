@@ -1,6 +1,7 @@
 package com.sreeraj.popularmovies.api;
 
 
+import com.sreeraj.popularmovies.api.response.ImagesResponseBean;
 import com.sreeraj.popularmovies.api.response.MovieListResponseBean;
 import com.sreeraj.popularmovies.api.response.VideoResponseBean;
 import com.sreeraj.popularmovies.models.Movie;
@@ -29,4 +30,7 @@ public interface WebService {
 
     @GET("{id}/videos")
     Call<VideoResponseBean> getVideoDetails(@Path("id") int id, @Query("api_key") String apiKey);
+
+    @GET("{id}/images")
+    Call<ImagesResponseBean> getImages(@Path("id") int id, @Query("api_key") String apiKey);
 }

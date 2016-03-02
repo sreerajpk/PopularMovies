@@ -29,13 +29,16 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.sreeraj.popularmovies.R;
+import com.sreeraj.popularmovies.api.ImagesApi;
 import com.sreeraj.popularmovies.api.MoviesApi;
 import com.sreeraj.popularmovies.api.VideoApi;
+import com.sreeraj.popularmovies.api.response.ImagesResponseBean;
 import com.sreeraj.popularmovies.api.response.VideoResponseBean;
 import com.sreeraj.popularmovies.app.Constants;
 import com.sreeraj.popularmovies.events.FailureEvent;
 import com.sreeraj.popularmovies.fragments.MoviePosterDialogFragment;
 import com.sreeraj.popularmovies.models.Genre;
+import com.sreeraj.popularmovies.models.Image;
 import com.sreeraj.popularmovies.models.Movie;
 import com.sreeraj.popularmovies.models.MovieGeneral;
 import com.sreeraj.popularmovies.models.Video;
@@ -90,6 +93,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private MovieGeneral movieGeneral;
     private Movie movie;
     private VideoResponseBean videoResponseBean;
+    private ImagesResponseBean imagesResponseBean;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -260,6 +264,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
             VideoApi videoApi = new VideoApi();
             videoApi.getVideoDetails(movieGeneral.getId(), getString(R.string.api_key));
+
+            ImagesApi imagesApi = new ImagesApi();
+            imagesApi.getImages(movieGeneral.getId(), getString(R.string.api_key));
         }
     }
 
@@ -298,7 +305,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
     public void onEvent(VideoResponseBean bean) {
-        if (this.movieGeneral.getId() == movie.getId()) {
+        if (movieGeneral.getId() == bean.getId()) {
             setVideoDetails(bean);
         }
         EventBus.getDefault().removeStickyEvent(bean);
@@ -307,7 +314,23 @@ public class MovieDetailsActivity extends AppCompatActivity {
     public void setVideoDetails(VideoResponseBean videoResponseBean) {
         this.videoResponseBean = videoResponseBean;
         for (Video video : videoResponseBean.getResults()) {
+            video.getSite();
 
+        }
+        //http://img.youtube.com/vi/GDFUdMvacI0/0.jpg
+    }
+
+    public void onEvent(ImagesResponseBean bean) {
+        if (movieGeneral.getId() == bean.getId()) {
+            setImagesDisplay(bean);
+        }
+        EventBus.getDefault().removeStickyEvent(bean);
+    }
+
+    public void setImagesDisplay(ImagesResponseBean imagesResponseBean) {
+        this.imagesResponseBean = imagesResponseBean;
+        for (Image image : imagesResponseBean.getBackdrops()) {
+            image.getFilePath();
         }
     }
 
