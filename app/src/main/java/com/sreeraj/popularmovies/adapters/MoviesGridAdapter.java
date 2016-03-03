@@ -67,8 +67,11 @@ public class MoviesGridAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         if (holder instanceof MovieViewHolder) {
-            Glide.with(context).load(Constants.IMAGE_BASE_URL
-                    + movieList.get(position).getPosterPath()).placeholder(R.color.lighter_gray).into(((MovieViewHolder) holder).image);
+            Glide.with(context)
+                    .load(Constants.IMAGE_BASE_URL + movieList.get(position).getPosterPath())
+                    .placeholder(R.color.lighter_gray)
+                    .error(R.drawable.ic_launcher)
+                    .into(((MovieViewHolder) holder).image);
             ((MovieViewHolder) holder).name.setText(movieList.get(position).getTitle());
         } else {
             ((ProgressViewHolder) holder).progressBar.setIndeterminate(true);

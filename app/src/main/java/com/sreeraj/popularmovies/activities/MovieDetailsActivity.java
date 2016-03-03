@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
@@ -19,16 +20,19 @@ import android.transition.TransitionInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.sreeraj.popularmovies.R;
+import com.sreeraj.popularmovies.adapters.ImagesViewPagerAdapter;
 import com.sreeraj.popularmovies.api.ImagesApi;
 import com.sreeraj.popularmovies.api.MoviesApi;
 import com.sreeraj.popularmovies.api.VideoApi;
@@ -45,6 +49,9 @@ import com.sreeraj.popularmovies.models.Video;
 import com.sreeraj.popularmovies.utils.Utils;
 
 import org.parceler.Parcels;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -88,6 +95,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
     CardView taglineLayout;
     @Bind(R.id.overview_card)
     CardView overviewCard;
+    @Bind(R.id.images_card)
+    CardView imagesCard;
+    @Bind(R.id.images_viewpager)
+    ViewPager imagesViewpager;
+    @Bind(R.id.number_of_images)
+    TextView numberOfImages;
     @Bind(R.id.fab)
     FloatingActionButton fab;
     private MovieGeneral movieGeneral;
@@ -141,6 +154,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 Glide.with(this).load(Constants.IMAGE_BASE_URL + movieGeneral.getBackdropPath())
                         .asBitmap()
                         .placeholder(R.color.lighter_gray)
+                        .error(R.drawable.ic_launcher)
                         .listener(new RequestListener<String, Bitmap>() {
                             @Override
                             public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
@@ -169,8 +183,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
             if (movieGeneral.getPosterPath() != null && !movieGeneral.getPosterPath().isEmpty()) {
                 final String posterPath = movieGeneral.getPosterPath();
-                Glide.with(this).load(Constants.IMAGE_BASE_URL
-                        + posterPath).placeholder(R.color.lighter_gray).into(thumbImage);
+                Glide.with(this).load(Constants.IMAGE_BASE_URL + posterPath)
+                        .placeholder(R.color.lighter_gray)
+                        .error(R.drawable.ic_launcher)
+                        .into(thumbImage);
                 thumbImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -327,11 +343,27 @@ public class MovieDetailsActivity extends AppCompatActivity {
         EventBus.getDefault().removeStickyEvent(bean);
     }
 
-    public void setImagesDisplay(ImagesResponseBean imagesResponseBean) {
+    public void setImagesDisplay(final ImagesResponseBean imagesResponseBean) {
         this.imagesResponseBean = imagesResponseBean;
+        List<String> imageUrls = new ArrayList<>();
+        imagesViewpager.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                // Set Viewpager height dynamically according to the aspect ratio of the image.
+                imagesViewpager.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int height = (int) ((imagesViewpager.getWidth() * 0.58f) / imagesResponseBean.getBackdrops().get(0).getAspectRatio());
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height);
+                imagesViewpager.setLayoutParams(params);
+            }
+        });
+        imagesCard.setVisibility(View.VISIBLE);
+        numberOfImages.setText(String.valueOf(imagesResponseBean.getBackdrops().size()));
         for (Image image : imagesResponseBean.getBackdrops()) {
-            image.getFilePath();
+            imageUrls.add(Constants.IMAGE_BASE_URL + image.getFilePath());
         }
+        ImagesViewPagerAdapter adapter = new ImagesViewPagerAdapter(getSupportFragmentManager());
+        adapter.setImageUrls(imageUrls);
+        imagesViewpager.setAdapter(adapter);
     }
 
     @Override
@@ -368,5 +400,4 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

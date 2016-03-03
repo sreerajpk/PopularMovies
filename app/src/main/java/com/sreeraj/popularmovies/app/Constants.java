@@ -15,4 +15,5 @@ public class Constants {
     public static final String MOVIE_GENERAL = "movie_general";
     public static final int PAGE_SIZE = 20;
     public static final String PAGE = "page";
+    public static final String IMAGE_URL = "image_url";
 }

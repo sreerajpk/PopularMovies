@@ -19,5 +19,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tagline">Tagline</string>
     <string name="overview">Overview</string>
+    <string name="images">Images</string>
 
 </resources>
