@@ -366,6 +366,11 @@ public class MovieDetailsActivity extends AppCompatActivity {
         imagesViewpager.setAdapter(adapter);
     }
 
+    // Event for getting ImageSelection from Viewpager
+    public void onEvent(Integer position) {
+
+    }
+
     @Override
     public void onResume() {
         super.onResume();
