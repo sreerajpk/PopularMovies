@@ -34,7 +34,7 @@ public class ImagesViewPagerAdapter extends FragmentStatePagerAdapter {
 //                break;
 //        }
 //        return null;
-        return ImagesFragment.newInstance(imageUrls.get(position));
+        return ImagesFragment.newInstance(imageUrls.get(position), position);
     }
 
     @Override
