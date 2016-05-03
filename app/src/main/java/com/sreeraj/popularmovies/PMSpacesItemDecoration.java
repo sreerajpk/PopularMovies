@@ -7,10 +7,10 @@ import android.view.View;
 /**
  * ItemDecoration for Recylcerview with grid of Movies.
  */
-public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+public class PMSpacesItemDecoration extends RecyclerView.ItemDecoration {
     private int space;
 
-    public SpacesItemDecoration(int space) {
+    public PMSpacesItemDecoration(int space) {
         this.space = space;
     }
 

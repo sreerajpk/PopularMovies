@@ -10,9 +10,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * VideoApi which handles api call to get videos of a movie.
+ * PMVideoApi which handles api call to get videos of a movie.
  */
-public class VideoApi extends BaseApi {
+public class PMVideoApi extends PMBaseApi {
 
     public void getVideoDetails(int id, String apiKey) {
         Call<VideoResponseBean> call = service.getVideoDetails(id, apiKey);

@@ -8,18 +8,18 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.sreeraj.popularmovies.app.Constants;
-import com.sreeraj.popularmovies.fragments.MovieListFragment;
+import com.sreeraj.popularmovies.app.PMConstants;
+import com.sreeraj.popularmovies.fragments.PMMovieListFragment;
 
 /**
  * A FragmentStatePagerAdapter that returns a fragment corresponding to
  * one of the sections/tabs/pages.
  */
-public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+public class PMSectionsPagerAdapter extends FragmentStatePagerAdapter {
 
     private String[] titles = {"POPULAR", "TOP RATED"};
 
-    public SectionsPagerAdapter(FragmentManager fm) {
+    public PMSectionsPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
@@ -29,9 +29,9 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         // Return a PlaceholderFragment (defined as a static inner class below).
         switch (position) {
             case 0:
-                return MovieListFragment.newInstance(Constants.POPULAR);
+                return PMMovieListFragment.newInstance(PMConstants.POPULAR);
             case 1:
-                return MovieListFragment.newInstance(Constants.TOP_RATED);
+                return PMMovieListFragment.newInstance(PMConstants.TOP_RATED);
             default:
                 break;
         }

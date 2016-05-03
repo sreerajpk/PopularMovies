@@ -33,15 +33,15 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.sreeraj.popularmovies.R;
-import com.sreeraj.popularmovies.adapters.ImagesViewPagerAdapter;
-import com.sreeraj.popularmovies.api.ImagesApi;
-import com.sreeraj.popularmovies.api.MoviesApi;
-import com.sreeraj.popularmovies.api.VideoApi;
+import com.sreeraj.popularmovies.adapters.PMImagesViewPagerAdapter;
+import com.sreeraj.popularmovies.api.PMImagesApi;
+import com.sreeraj.popularmovies.api.PMMoviesApi;
+import com.sreeraj.popularmovies.api.PMVideoApi;
 import com.sreeraj.popularmovies.api.response.ImagesResponseBean;
 import com.sreeraj.popularmovies.api.response.VideoResponseBean;
-import com.sreeraj.popularmovies.app.Constants;
+import com.sreeraj.popularmovies.app.PMConstants;
 import com.sreeraj.popularmovies.events.FailureEvent;
-import com.sreeraj.popularmovies.fragments.MoviePosterDialogFragment;
+import com.sreeraj.popularmovies.fragments.PMMoviePosterDialogFragment;
 import com.sreeraj.popularmovies.models.Genre;
 import com.sreeraj.popularmovies.models.Image;
 import com.sreeraj.popularmovies.models.Movie;
@@ -62,7 +62,7 @@ import de.greenrobot.event.EventBus;
  * The activity which shows the details of a particular movieGeneral.
  */
 
-public class MovieDetailsActivity extends AppCompatActivity {
+public class PMMovieDetailsActivity extends AppCompatActivity {
 
     private static final double COLOR_DARKENING_FRACTION = 0.85;
     private static final String RATING_OUT_OF = "/10";
@@ -132,8 +132,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
         movieGeneral = new MovieGeneral();
         if (getIntent() != null) {
             Intent intent = getIntent();
-            Bundle bundle = intent.getBundleExtra(Constants.BUNDLE);
-            movieGeneral = Parcels.unwrap(bundle.getParcelable(Constants.MOVIE_GENERAL));
+            Bundle bundle = intent.getBundleExtra(PMConstants.BUNDLE);
+            movieGeneral = Parcels.unwrap(bundle.getParcelable(PMConstants.MOVIE_GENERAL));
         }
         restoreDataFromSavedInstanceState(savedInstanceState);
         setData();
@@ -148,14 +148,18 @@ public class MovieDetailsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 fab.setSelected(!fab.isSelected());
                 movieGeneral.setIsFavourite(fab.isSelected());
-                // Code to store the favourite movies in db
+                if (fab.isSelected()) {
+                    // Code to store the movie as favourite in db
+                } else {
+                    // Code to remove the movie from favourite db
+                }
             }
         });
     }
 
     private void restoreDataFromSavedInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            movieGeneral = Parcels.unwrap(savedInstanceState.getParcelable(Constants.MOVIE_GENERAL));
+            movieGeneral = Parcels.unwrap(savedInstanceState.getParcelable(PMConstants.MOVIE_GENERAL));
             movie = Parcels.unwrap(savedInstanceState.getParcelable(MOVIE));
             if (movie != null) {
                 setMovieDetails(movie);
@@ -174,7 +178,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private void setData() {
         if (movieGeneral != null) {
             if (movieGeneral.getBackdropPath() != null && !movieGeneral.getBackdropPath().isEmpty()) {
-                Glide.with(this).load(Constants.IMAGE_BASE_URL + movieGeneral.getBackdropPath())
+                Glide.with(this).load(PMConstants.IMAGE_BASE_URL + movieGeneral.getBackdropPath())
                         .asBitmap()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.color.lighter_gray)
@@ -207,7 +211,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
             if (movieGeneral.getPosterPath() != null && !movieGeneral.getPosterPath().isEmpty()) {
                 final String posterPath = movieGeneral.getPosterPath();
-                Glide.with(this).load(Constants.IMAGE_BASE_URL + posterPath)
+                Glide.with(this).load(PMConstants.IMAGE_BASE_URL + posterPath)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.color.lighter_gray)
                         .error(R.drawable.ic_launcher)
@@ -215,7 +219,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 thumbImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final DialogFragment moviePosterDialog = MoviePosterDialogFragment.newInstance(Constants.IMAGE_BASE_URL
+                        final DialogFragment moviePosterDialog = PMMoviePosterDialogFragment.newInstance(PMConstants.IMAGE_BASE_URL
                                 + posterPath, movieGeneral.getOriginalTitle());
                         moviePosterDialog.show(getSupportFragmentManager(), MOVIE_POSTER);
                     }
@@ -300,13 +304,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     private void fetchMovieDetails() {
         if (Utils.isNetworkAvailable(this)) {
-            MoviesApi moviesApi = new MoviesApi();
+            PMMoviesApi moviesApi = new PMMoviesApi();
             moviesApi.getMovieDetails(movieGeneral.getId(), getString(R.string.api_key));
 
-            VideoApi videoApi = new VideoApi();
+            PMVideoApi videoApi = new PMVideoApi();
             videoApi.getVideoDetails(movieGeneral.getId(), getString(R.string.api_key));
 
-            ImagesApi imagesApi = new ImagesApi();
+            PMImagesApi imagesApi = new PMImagesApi();
             imagesApi.getImages(movieGeneral.getId(), getString(R.string.api_key));
         }
     }
@@ -347,7 +351,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     public void onEvent(VideoResponseBean bean) {
         if (movieGeneral.getId() == bean.getId()) {
-            setVideoList(bean);
+            if (bean.getResults().size() > 0) {
+                setVideoList(bean);
+            }
         }
         EventBus.getDefault().removeStickyEvent(bean);
     }
@@ -368,12 +374,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
         });
         for (Video video : videoResponseBean.getResults()) {
-            String thumbImage = String.format(Constants.VIDEO_THUMB_IMAGE_BASE_URL, video.getKey());
+            String thumbImage = String.format(PMConstants.VIDEO_THUMB_IMAGE_BASE_URL, video.getKey());
             thumbImageUrls.add(thumbImage);
-            videoUrls.add(Constants.VIDEO_BASE_URL + video.getKey());
+            videoUrls.add(PMConstants.VIDEO_BASE_URL + video.getKey());
         }
-        ImagesViewPagerAdapter adapter = new ImagesViewPagerAdapter(getSupportFragmentManager());
-        adapter.setVideoAndThumbImagesUrls(thumbImageUrls, videoUrls, Constants.VIDEOS);
+        PMImagesViewPagerAdapter adapter = new PMImagesViewPagerAdapter(getSupportFragmentManager());
+        adapter.setVideoAndThumbImagesUrls(thumbImageUrls, videoUrls, PMConstants.VIDEOS);
         videosViewpager.setAdapter(adapter);
         videosViewpager.setPageMargin(getResources().getDimensionPixelSize(R.dimen.padding_small));
         videosCard.setVisibility(View.VISIBLE);
@@ -381,7 +387,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     public void onEvent(ImagesResponseBean bean) {
         if (movieGeneral.getId() == bean.getId()) {
-            setImagesDisplay(bean);
+            if (bean.getBackdrops().size() > 0) {
+                setImagesDisplay(bean);
+            }
         }
         EventBus.getDefault().removeStickyEvent(bean);
     }
@@ -402,10 +410,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
         });
         numberOfImages.setText(String.valueOf(imagesResponseBean.getBackdrops().size()));
         for (Image image : imagesResponseBean.getBackdrops()) {
-            imageUrls.add(Constants.IMAGE_BASE_URL + image.getFilePath());
+            imageUrls.add(PMConstants.IMAGE_BASE_URL + image.getFilePath());
         }
-        ImagesViewPagerAdapter adapter = new ImagesViewPagerAdapter(getSupportFragmentManager());
-        adapter.setImageUrls(imageUrls, Constants.IMAGES);
+        PMImagesViewPagerAdapter adapter = new PMImagesViewPagerAdapter(getSupportFragmentManager());
+        adapter.setImageUrls(imageUrls, PMConstants.IMAGES);
         imagesViewpager.setAdapter(adapter);
         imagesViewpager.setPageMargin(getResources().getDimensionPixelSize(R.dimen.padding_small));
         imagesCard.setVisibility(View.VISIBLE);
@@ -429,7 +437,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(Constants.MOVIE_GENERAL, Parcels.wrap(movieGeneral));
+        outState.putParcelable(PMConstants.MOVIE_GENERAL, Parcels.wrap(movieGeneral));
         storeDetailsInSavedInstanceState(outState);
         super.onSaveInstanceState(outState);
     }

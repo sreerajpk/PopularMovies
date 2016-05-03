@@ -8,7 +8,7 @@ import com.sreeraj.popularmovies.R;
 /**
  * Created by Sreeraj on 3/14/16.
  */
-public class ImagesViewPagerActivity extends AppCompatActivity {
+public class PMImagesViewPagerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

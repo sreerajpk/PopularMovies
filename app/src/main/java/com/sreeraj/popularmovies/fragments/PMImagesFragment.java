@@ -13,8 +13,8 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.sreeraj.popularmovies.R;
-import com.sreeraj.popularmovies.activities.ImagesViewPagerActivity;
-import com.sreeraj.popularmovies.app.Constants;
+import com.sreeraj.popularmovies.activities.PMImagesViewPagerActivity;
+import com.sreeraj.popularmovies.app.PMConstants;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
 /**
  * Fragment to show images in a viewpager
  */
-public class ImagesFragment extends Fragment {
+public class PMImagesFragment extends Fragment {
 
     private static final String POSITION = "position";
     private static final String TYPE = "type";
@@ -36,12 +36,12 @@ public class ImagesFragment extends Fragment {
     private String type;
     private int position;
 
-    public ImagesFragment() {
+    public PMImagesFragment() {
         // Required empty public constructor
     }
 
-    public static ImagesFragment newInstance(String url, int position, String type) {
-        ImagesFragment fragment = new ImagesFragment();
+    public static PMImagesFragment newInstance(String url, int position, String type) {
+        PMImagesFragment fragment = new PMImagesFragment();
         Bundle args = new Bundle();
         args.putString(IMAGE_URL, url);
         args.putInt(POSITION, position);
@@ -50,8 +50,8 @@ public class ImagesFragment extends Fragment {
         return fragment;
     }
 
-    public static ImagesFragment newInstance(String thumbUrl, String videoUrl, int position, String type) {
-        ImagesFragment fragment = new ImagesFragment();
+    public static PMImagesFragment newInstance(String thumbUrl, String videoUrl, int position, String type) {
+        PMImagesFragment fragment = new PMImagesFragment();
         Bundle args = new Bundle();
         args.putString(IMAGE_URL, thumbUrl);
         args.putString(VIDEO_URL, videoUrl);
@@ -83,10 +83,10 @@ public class ImagesFragment extends Fragment {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (type.equals(Constants.IMAGES)) {
+                if (type.equals(PMConstants.IMAGES)) {
                     Bundle bundle = null;
-                    Intent intent = new Intent(getActivity(), ImagesViewPagerActivity.class);
-                    getActivity().startActivityFromFragment(ImagesFragment.this, intent, REQUEST_CODE);
+                    Intent intent = new Intent(getActivity(), PMImagesViewPagerActivity.class);
+                    getActivity().startActivityFromFragment(PMImagesFragment.this, intent, REQUEST_CODE);
                 } else {
                     //Redirect to Youtube to play video
                     Intent playVideoIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl));
@@ -94,7 +94,7 @@ public class ImagesFragment extends Fragment {
                 }
             }
         });
-        if (type.equals(Constants.VIDEOS)) {
+        if (type.equals(PMConstants.VIDEOS)) {
 
         }
     }

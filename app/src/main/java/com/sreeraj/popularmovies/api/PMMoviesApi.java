@@ -15,9 +15,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * MoviesApi which handles api calls to get list of movies.
+ * PMMoviesApi which handles api calls to get list of movies.
  */
-public class MoviesApi extends BaseApi {
+public class PMMoviesApi extends PMBaseApi {
 
     public void getPopularMovies(Map<String, String> options) {
         Call<MovieListResponseBean> call = service.getPopularMovies(options);

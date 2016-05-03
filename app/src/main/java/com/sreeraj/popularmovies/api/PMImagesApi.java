@@ -12,7 +12,7 @@ import retrofit2.Response;
 /**
  * Created by Sreeraj on 3/2/16.
  */
-public class ImagesApi extends BaseApi {
+public class PMImagesApi extends PMBaseApi {
 
     public void getImages(int id, String apiKey) {
         Call<ImagesResponseBean> call = service.getImages(id, apiKey);

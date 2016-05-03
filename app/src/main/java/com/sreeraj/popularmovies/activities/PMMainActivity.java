@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.sreeraj.popularmovies.R;
-import com.sreeraj.popularmovies.adapters.SectionsPagerAdapter;
+import com.sreeraj.popularmovies.adapters.PMSectionsPagerAdapter;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -16,7 +16,7 @@ import butterknife.ButterKnife;
  * The main activity.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class PMMainActivity extends AppCompatActivity {
 
     @Bind(R.id.container)
     ViewPager mViewPager;
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setViews() {
         setSupportActionBar(toolbar);
-        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        PMSectionsPagerAdapter mSectionsPagerAdapter = new PMSectionsPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSectionsPagerAdapter);
         tabLayout.setupWithViewPager(mViewPager);
     }

@@ -21,4 +21,6 @@
     <dimen name="text_heading">16sp</dimen>
     <dimen name="text_large">17sp</dimen>
 
+    <item name="movie_item_image_aspect_ratio" format="float" type="dimen">.675</item>
+
 </resources>

@@ -1,6 +1,6 @@
 package com.sreeraj.popularmovies.api;
 
-import com.sreeraj.popularmovies.app.Constants;
+import com.sreeraj.popularmovies.app.PMConstants;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -8,16 +8,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * Base Api.
  */
-public class BaseApi {
+public class PMBaseApi {
 
-    protected WebService service;
+    protected PMWebService service;
 
-    public BaseApi() {
+    public PMBaseApi() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
+                .baseUrl(PMConstants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        service = retrofit.create(WebService.class);
+        service = retrofit.create(PMWebService.class);
     }
 
 }

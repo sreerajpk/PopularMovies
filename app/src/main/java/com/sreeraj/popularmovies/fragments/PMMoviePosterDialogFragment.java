@@ -20,7 +20,7 @@ import butterknife.ButterKnife;
 /**
  * Fragment which shows a large poster image and title of the movie.
  */
-public class MoviePosterDialogFragment extends DialogFragment {
+public class PMMoviePosterDialogFragment extends DialogFragment {
 
     private static final String URL = "url";
     private static final String TITLE = "title";
@@ -31,8 +31,8 @@ public class MoviePosterDialogFragment extends DialogFragment {
     TextView movieTitle;
 
     @NonNull
-    public static MoviePosterDialogFragment newInstance(String url, String title) {
-        MoviePosterDialogFragment fragment = new MoviePosterDialogFragment();
+    public static PMMoviePosterDialogFragment newInstance(String url, String title) {
+        PMMoviePosterDialogFragment fragment = new PMMoviePosterDialogFragment();
         Bundle bundle = new Bundle();
         bundle.putString(URL, url);
         bundle.putString(TITLE, title);

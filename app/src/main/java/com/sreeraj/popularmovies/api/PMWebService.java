@@ -17,7 +17,7 @@ import retrofit2.http.QueryMap;
 /**
  * Web service class with all api calls.
  */
-public interface WebService {
+public interface PMWebService {
 
     @GET("popular")
     Call<MovieListResponseBean> getPopularMovies(@QueryMap Map<String, String> options);

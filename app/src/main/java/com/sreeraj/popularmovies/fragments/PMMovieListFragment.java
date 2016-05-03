@@ -19,13 +19,13 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.sreeraj.popularmovies.PMSpacesItemDecoration;
 import com.sreeraj.popularmovies.R;
-import com.sreeraj.popularmovies.SpacesItemDecoration;
-import com.sreeraj.popularmovies.activities.MovieDetailsActivity;
-import com.sreeraj.popularmovies.adapters.MoviesGridAdapter;
-import com.sreeraj.popularmovies.api.MoviesApi;
+import com.sreeraj.popularmovies.activities.PMMovieDetailsActivity;
+import com.sreeraj.popularmovies.adapters.PMMoviesGridAdapter;
+import com.sreeraj.popularmovies.api.PMMoviesApi;
 import com.sreeraj.popularmovies.api.response.MovieListResponseBean;
-import com.sreeraj.popularmovies.app.Constants;
+import com.sreeraj.popularmovies.app.PMConstants;
 import com.sreeraj.popularmovies.events.FailureEvent;
 import com.sreeraj.popularmovies.events.MoviesSelectionEvent;
 import com.sreeraj.popularmovies.events.PopularMoviesEvent;
@@ -47,7 +47,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Fragment which handles movielist.
  */
-public class MovieListFragment extends Fragment {
+public class PMMovieListFragment extends Fragment {
 
     private static final String THUMB_IMAGE_TRANSITION_NAME = "thumb_image";
     private static final String POSITION = "position";
@@ -65,7 +65,7 @@ public class MovieListFragment extends Fragment {
     @Bind(R.id.progress_bar)
     ProgressBar progressBar;
     private Context context;
-    private MoviesGridAdapter adapter;
+    private PMMoviesGridAdapter adapter;
     private GridLayoutManager layoutManager;
     private List<MovieGeneral> movieList;
     private int position;
@@ -91,7 +91,7 @@ public class MovieListFragment extends Fragment {
             if (!isLoading && currentPage < totalPages) {
                 if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0
-                        && totalItemCount >= Constants.PAGE_SIZE) {
+                        && totalItemCount >= PMConstants.PAGE_SIZE) {
                     if (Utils.isNetworkAvailable(getActivity())) {
                         loadMoreItems();
                     }
@@ -100,12 +100,12 @@ public class MovieListFragment extends Fragment {
         }
     };
 
-    public MovieListFragment() {
+    public PMMovieListFragment() {
         //Required empty constructor
     }
 
-    public static MovieListFragment newInstance(int position) {
-        MovieListFragment fragment = new MovieListFragment();
+    public static PMMovieListFragment newInstance(int position) {
+        PMMovieListFragment fragment = new PMMovieListFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(POSITION, position);
         fragment.setArguments(bundle);
@@ -165,14 +165,14 @@ public class MovieListFragment extends Fragment {
 
     private void initViews() {
         layoutManager = new GridLayoutManager(context, getResources().getInteger(R.integer.number_of_columns));
-        adapter = new MoviesGridAdapter(context, position);
+        adapter = new PMMoviesGridAdapter(context, position);
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 switch (adapter.getItemViewType(position)) {
-                    case MoviesGridAdapter.VIEW_ITEM:
+                    case PMMoviesGridAdapter.VIEW_ITEM:
                         return MOVIE_ITEM_SIZE;
-                    case MoviesGridAdapter.VIEW_PROG:
+                    case PMMoviesGridAdapter.VIEW_PROG:
                         return getResources().getInteger(R.integer.size_of_progress_pagination);
                     default:
                         return -1;
@@ -188,7 +188,7 @@ public class MovieListFragment extends Fragment {
             }
         });
         int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.spacing);
-        moviesGrid.addItemDecoration(new SpacesItemDecoration(spacingInPixels));
+        moviesGrid.addItemDecoration(new PMSpacesItemDecoration(spacingInPixels));
         moviesGrid.setHasFixedSize(true);
         moviesGrid.setAdapter(adapter);
         moviesGrid.addOnScrollListener(mRecyclerViewOnScrollListener);
@@ -202,11 +202,11 @@ public class MovieListFragment extends Fragment {
 
     private void loadMoreItems() {
         isLoading = true;
-        MoviesApi moviesApi = new MoviesApi();
+        PMMoviesApi moviesApi = new PMMoviesApi();
         Map<String, String> options = new HashMap<>();
-        options.put(Constants.API_KEY, getString(R.string.api_key));
-        options.put(Constants.PAGE, String.valueOf(currentPage + 1));
-        if (position == Constants.POPULAR) {
+        options.put(PMConstants.API_KEY, getString(R.string.api_key));
+        options.put(PMConstants.PAGE, String.valueOf(currentPage + 1));
+        if (position == PMConstants.POPULAR) {
             moviesApi.getPopularMovies(options);
         } else {
             moviesApi.getTopRatedMovies(options);
@@ -225,10 +225,10 @@ public class MovieListFragment extends Fragment {
     private void fetchMovieList() {
         if (Utils.isNetworkAvailable(context)) {
             progressBar.setVisibility(View.VISIBLE);
-            MoviesApi moviesApi = new MoviesApi();
+            PMMoviesApi moviesApi = new PMMoviesApi();
             Map<String, String> options = new HashMap<>();
-            options.put(Constants.API_KEY, getString(R.string.api_key));
-            if (position == Constants.POPULAR) {
+            options.put(PMConstants.API_KEY, getString(R.string.api_key));
+            if (position == PMConstants.POPULAR) {
                 moviesApi.getPopularMovies(options);
             } else {
                 moviesApi.getTopRatedMovies(options);
@@ -241,10 +241,10 @@ public class MovieListFragment extends Fragment {
 
     public void onEvent(MoviesSelectionEvent event) {
         if (position == event.getMovieListSortType()) {
-            Intent intent = new Intent(getActivity(), MovieDetailsActivity.class);
+            Intent intent = new Intent(getActivity(), PMMovieDetailsActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putParcelable(Constants.MOVIE_GENERAL, Parcels.wrap(event.getSelectedMovie()));
-            intent.putExtra(Constants.BUNDLE, bundle);
+            bundle.putParcelable(PMConstants.MOVIE_GENERAL, Parcels.wrap(event.getSelectedMovie()));
+            intent.putExtra(PMConstants.BUNDLE, bundle);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 ActivityOptionsCompat options = ActivityOptionsCompat.
                         makeSceneTransitionAnimation(getActivity(), event.getView(), THUMB_IMAGE_TRANSITION_NAME);
@@ -256,7 +256,7 @@ public class MovieListFragment extends Fragment {
     }
 
     public void onEvent(PopularMoviesEvent event) {
-        if (position == Constants.POPULAR) {
+        if (position == PMConstants.POPULAR) {
             MovieListResponseBean bean = event.getResponseBean();
             setMovieList(bean);
             //if (apiCallsInProgress == 0) { //If all api call results are delivered as sticky
@@ -282,7 +282,7 @@ public class MovieListFragment extends Fragment {
     }
 
     public void onEvent(TopRatedMoviesEvent event) {
-        if (position == Constants.TOP_RATED) {
+        if (position == PMConstants.TOP_RATED) {
             MovieListResponseBean bean = event.getResponseBean();
             setMovieList(bean);
             //if (apiCallsInProgress == 0) { //If all api call results are delivered as sticky

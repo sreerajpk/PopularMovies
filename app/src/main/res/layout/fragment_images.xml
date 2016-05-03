@@ -9,6 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@null"
-        tools:context="com.sreeraj.popularmovies.fragments.ImagesFragment"/>
+        tools:context=".fragments.PMImagesFragment"/>
 </RelativeLayout>
 

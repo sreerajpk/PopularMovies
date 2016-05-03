@@ -14,7 +14,7 @@
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.PMMainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -32,12 +32,12 @@
 
         </activity>
         <activity
-            android:name=".activities.MovieDetailsActivity"
+            android:name=".activities.PMMovieDetailsActivity"
             android:label="@string/title_activity_movie_details"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".activities.ImagesViewPagerActivity"
+            android:name=".activities.PMImagesViewPagerActivity"
             android:label="@string/title_activity_movie_details"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
