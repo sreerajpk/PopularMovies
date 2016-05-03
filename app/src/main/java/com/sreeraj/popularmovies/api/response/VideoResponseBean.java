@@ -2,15 +2,18 @@ package com.sreeraj.popularmovies.api.response;
 
 import com.sreeraj.popularmovies.models.Video;
 
+import org.parceler.Parcel;
+
 import java.util.List;
 
 /**
- * Created by Sreeraj on 3/1/16.
+ * Model object for videos list of a movie
  */
+@Parcel
 public class VideoResponseBean {
 
-    private int id;
-    private List<Video> results;
+    public int id;
+    public List<Video> results;
 
     public int getId() {
         return id;

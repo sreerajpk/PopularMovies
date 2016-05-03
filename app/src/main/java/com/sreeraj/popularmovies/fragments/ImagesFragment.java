@@ -2,6 +2,7 @@ package com.sreeraj.popularmovies.fragments;
 
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,13 +11,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.sreeraj.popularmovies.R;
 import com.sreeraj.popularmovies.activities.ImagesViewPagerActivity;
 import com.sreeraj.popularmovies.app.Constants;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import de.greenrobot.event.EventBus;
 
 /**
  * Fragment to show images in a viewpager
@@ -24,20 +25,38 @@ import de.greenrobot.event.EventBus;
 public class ImagesFragment extends Fragment {
 
     private static final String POSITION = "position";
+    private static final String TYPE = "type";
+    private static final String IMAGE_URL = "image_url";
+    private static final String VIDEO_URL = "video_url";
+    private static final int REQUEST_CODE = 100;
     @Bind(R.id.image)
     ImageView image;
-    private String url;
+    private String imageUrl;
+    private String videoUrl;
+    private String type;
     private int position;
 
     public ImagesFragment() {
         // Required empty public constructor
     }
 
-    public static ImagesFragment newInstance(String url, int position) {
+    public static ImagesFragment newInstance(String url, int position, String type) {
         ImagesFragment fragment = new ImagesFragment();
         Bundle args = new Bundle();
-        args.putString(Constants.IMAGE_URL, url);
+        args.putString(IMAGE_URL, url);
         args.putInt(POSITION, position);
+        args.putString(TYPE, type);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static ImagesFragment newInstance(String thumbUrl, String videoUrl, int position, String type) {
+        ImagesFragment fragment = new ImagesFragment();
+        Bundle args = new Bundle();
+        args.putString(IMAGE_URL, thumbUrl);
+        args.putString(VIDEO_URL, videoUrl);
+        args.putInt(POSITION, position);
+        args.putString(TYPE, type);
         fragment.setArguments(args);
         return fragment;
     }
@@ -48,15 +67,12 @@ public class ImagesFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_images, container, false);
         if (getArguments() != null) {
-            url = getArguments().getString(Constants.IMAGE_URL);
-            position = getArguments().getInt(POSITION);
+            Bundle bundle = getArguments();
+            imageUrl = bundle.getString(IMAGE_URL);
+            position = bundle.getInt(POSITION);
+            type = bundle.getString(TYPE);
+            videoUrl = bundle.getString(VIDEO_URL);
         }
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EventBus.getDefault().post(position);
-            }
-        });
         ButterKnife.bind(this, view);
         return view;
     }
@@ -67,16 +83,27 @@ public class ImagesFragment extends Fragment {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = null;
-                Intent intent = new Intent(getActivity(), ImagesViewPagerActivity.class);
-                getActivity().startActivityFromFragment(ImagesFragment.this, intent, 100);
+                if (type.equals(Constants.IMAGES)) {
+                    Bundle bundle = null;
+                    Intent intent = new Intent(getActivity(), ImagesViewPagerActivity.class);
+                    getActivity().startActivityFromFragment(ImagesFragment.this, intent, REQUEST_CODE);
+                } else {
+                    //Redirect to Youtube to play video
+                    Intent playVideoIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl));
+                    startActivity(playVideoIntent);
+                }
             }
         });
+        if (type.equals(Constants.VIDEOS)) {
+
+        }
     }
 
     @Override
     public void onStart() {
-        Glide.with(this).load(url).placeholder(R.drawable.ic_launcher).error(R.drawable.ic_launcher).into(image);
+        Glide.with(this).load(imageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.color.lighter_gray).error(R.drawable.ic_launcher).into(image);
         super.onStart();
     }
 }

@@ -20,5 +20,6 @@
     <string name="tagline">Tagline</string>
     <string name="overview">Overview</string>
     <string name="images">Images</string>
+    <string name="trailers">Trailers</string>
 
 </resources>

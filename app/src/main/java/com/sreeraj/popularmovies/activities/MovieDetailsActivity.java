@@ -29,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.sreeraj.popularmovies.R;
@@ -67,8 +68,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private static final String RATING_OUT_OF = "/10";
     private static final String MOVIE_POSTER = "movie_poster";
     private static final int SHORT_ANIMATION_DURATION = 200;
+    private static final float IMAGE_WIDTH_FRACTION = 0.6f;
+    private static final float IMAGE_HEIGHT_FRACTION = 0.75f;
     private static final String DOUBLE_QUOTES = "\"";
     private static final String MOVIE = "movie";
+    private static final String VIDEO = "videos";
+    private static final String IMAGE = "images";
     @Bind(R.id.poster_image)
     ImageView posterImage;
     @Bind(R.id.collapsing_toolbar)
@@ -101,6 +106,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
     ViewPager imagesViewpager;
     @Bind(R.id.number_of_images)
     TextView numberOfImages;
+    @Bind(R.id.videos_card)
+    CardView videosCard;
+    @Bind(R.id.videos_viewpager)
+    ViewPager videosViewpager;
+    @Bind(R.id.number_of_videos)
+    TextView numberOfVideos;
     @Bind(R.id.fab)
     FloatingActionButton fab;
     private MovieGeneral movieGeneral;
@@ -124,13 +135,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             Bundle bundle = intent.getBundleExtra(Constants.BUNDLE);
             movieGeneral = Parcels.unwrap(bundle.getParcelable(Constants.MOVIE_GENERAL));
         }
-        if (savedInstanceState != null) {
-            movieGeneral = Parcels.unwrap(savedInstanceState.getParcelable(Constants.MOVIE_GENERAL));
-            movie = Parcels.unwrap(savedInstanceState.getParcelable(MOVIE));
-            if (movie != null) {
-                setMovieDetails(movie);
-            }
-        }
+        restoreDataFromSavedInstanceState(savedInstanceState);
         setData();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setSharedElementTransition();
@@ -148,11 +153,30 @@ public class MovieDetailsActivity extends AppCompatActivity {
         });
     }
 
+    private void restoreDataFromSavedInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            movieGeneral = Parcels.unwrap(savedInstanceState.getParcelable(Constants.MOVIE_GENERAL));
+            movie = Parcels.unwrap(savedInstanceState.getParcelable(MOVIE));
+            if (movie != null) {
+                setMovieDetails(movie);
+            }
+            videoResponseBean = Parcels.unwrap(savedInstanceState.getParcelable(VIDEO));
+            if (videoResponseBean != null) {
+                setVideoList(videoResponseBean);
+            }
+            imagesResponseBean = Parcels.unwrap(savedInstanceState.getParcelable(IMAGE));
+            if (imagesResponseBean != null) {
+                setImagesDisplay(imagesResponseBean);
+            }
+        }
+    }
+
     private void setData() {
         if (movieGeneral != null) {
             if (movieGeneral.getBackdropPath() != null && !movieGeneral.getBackdropPath().isEmpty()) {
                 Glide.with(this).load(Constants.IMAGE_BASE_URL + movieGeneral.getBackdropPath())
                         .asBitmap()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.color.lighter_gray)
                         .error(R.drawable.ic_launcher)
                         .listener(new RequestListener<String, Bitmap>() {
@@ -184,6 +208,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             if (movieGeneral.getPosterPath() != null && !movieGeneral.getPosterPath().isEmpty()) {
                 final String posterPath = movieGeneral.getPosterPath();
                 Glide.with(this).load(Constants.IMAGE_BASE_URL + posterPath)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.color.lighter_gray)
                         .error(R.drawable.ic_launcher)
                         .into(thumbImage);
@@ -322,18 +347,36 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     public void onEvent(VideoResponseBean bean) {
         if (movieGeneral.getId() == bean.getId()) {
-            setVideoDetails(bean);
+            setVideoList(bean);
         }
         EventBus.getDefault().removeStickyEvent(bean);
     }
 
-    public void setVideoDetails(VideoResponseBean videoResponseBean) {
+    public void setVideoList(VideoResponseBean videoResponseBean) {
         this.videoResponseBean = videoResponseBean;
+        List<String> thumbImageUrls = new ArrayList<>();
+        List<String> videoUrls = new ArrayList<>();
+        numberOfVideos.setText(String.valueOf(videoResponseBean.getResults().size()));
+        videosViewpager.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                // Set Viewpager height dynamically according to the aspect ratio of the image.
+                videosViewpager.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int height = (int) ((videosViewpager.getWidth() * IMAGE_WIDTH_FRACTION * IMAGE_HEIGHT_FRACTION));
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height);
+                videosViewpager.setLayoutParams(params);
+            }
+        });
         for (Video video : videoResponseBean.getResults()) {
-            video.getSite();
-
+            String thumbImage = String.format(Constants.VIDEO_THUMB_IMAGE_BASE_URL, video.getKey());
+            thumbImageUrls.add(thumbImage);
+            videoUrls.add(Constants.VIDEO_BASE_URL + video.getKey());
         }
-        //http://img.youtube.com/vi/GDFUdMvacI0/0.jpg
+        ImagesViewPagerAdapter adapter = new ImagesViewPagerAdapter(getSupportFragmentManager());
+        adapter.setVideoAndThumbImagesUrls(thumbImageUrls, videoUrls, Constants.VIDEOS);
+        videosViewpager.setAdapter(adapter);
+        videosViewpager.setPageMargin(getResources().getDimensionPixelSize(R.dimen.padding_small));
+        videosCard.setVisibility(View.VISIBLE);
     }
 
     public void onEvent(ImagesResponseBean bean) {
@@ -351,24 +394,21 @@ public class MovieDetailsActivity extends AppCompatActivity {
             public void onGlobalLayout() {
                 // Set Viewpager height dynamically according to the aspect ratio of the image.
                 imagesViewpager.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int height = (int) ((imagesViewpager.getWidth() * 0.58f) / imagesResponseBean.getBackdrops().get(0).getAspectRatio());
+                int height = (int) ((imagesViewpager.getWidth() * IMAGE_WIDTH_FRACTION)
+                        / imagesResponseBean.getBackdrops().get(0).getAspectRatio());
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height);
                 imagesViewpager.setLayoutParams(params);
             }
         });
-        imagesCard.setVisibility(View.VISIBLE);
         numberOfImages.setText(String.valueOf(imagesResponseBean.getBackdrops().size()));
         for (Image image : imagesResponseBean.getBackdrops()) {
             imageUrls.add(Constants.IMAGE_BASE_URL + image.getFilePath());
         }
         ImagesViewPagerAdapter adapter = new ImagesViewPagerAdapter(getSupportFragmentManager());
-        adapter.setImageUrls(imageUrls);
+        adapter.setImageUrls(imageUrls, Constants.IMAGES);
         imagesViewpager.setAdapter(adapter);
-    }
-
-    // Event for getting ImageSelection from Viewpager
-    public void onEvent(Integer position) {
-
+        imagesViewpager.setPageMargin(getResources().getDimensionPixelSize(R.dimen.padding_small));
+        imagesCard.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -390,10 +430,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(Constants.MOVIE_GENERAL, Parcels.wrap(movieGeneral));
+        storeDetailsInSavedInstanceState(outState);
+        super.onSaveInstanceState(outState);
+    }
+
+    private void storeDetailsInSavedInstanceState(Bundle outState) {
         if (movie != null) {
             outState.putParcelable(MOVIE, Parcels.wrap(movie));
         }
-        super.onSaveInstanceState(outState);
+        if (videoResponseBean != null) {
+            outState.putParcelable(VIDEO, Parcels.wrap(videoResponseBean));
+        }
+        if (imagesResponseBean != null) {
+            outState.putParcelable(IMAGE, Parcels.wrap(imagesResponseBean));
+        }
     }
 
 

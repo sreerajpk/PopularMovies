@@ -92,7 +92,9 @@ public class MovieListFragment extends Fragment {
                 if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0
                         && totalItemCount >= Constants.PAGE_SIZE) {
-                    loadMoreItems();
+                    if (Utils.isNetworkAvailable(getActivity())) {
+                        loadMoreItems();
+                    }
                 }
             }
         }

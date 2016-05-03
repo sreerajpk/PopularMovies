@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.sreeraj.popularmovies.R;
 import com.sreeraj.popularmovies.app.Constants;
 import com.sreeraj.popularmovies.events.MoviesSelectionEvent;
@@ -69,6 +70,7 @@ public class MoviesGridAdapter extends RecyclerView.Adapter {
         if (holder instanceof MovieViewHolder) {
             Glide.with(context)
                     .load(Constants.IMAGE_BASE_URL + movieList.get(position).getPosterPath())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.color.lighter_gray)
                     .error(R.drawable.ic_launcher)
                     .into(((MovieViewHolder) holder).image);
