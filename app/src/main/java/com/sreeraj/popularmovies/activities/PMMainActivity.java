@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.sreeraj.popularmovies.R;
 import com.sreeraj.popularmovies.adapters.PMSectionsPagerAdapter;
+import com.sreeraj.popularmovies.app.PopularMoviesApplication;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -34,6 +35,11 @@ public class PMMainActivity extends AppCompatActivity {
     }
 
     private void setViews() {
+        if (findViewById(R.id.movie_detail_container) != null) {
+            PopularMoviesApplication.setIsTwoPane(true);
+        } else {
+            PopularMoviesApplication.setIsTwoPane(false);
+        }
         setSupportActionBar(toolbar);
         PMSectionsPagerAdapter mSectionsPagerAdapter = new PMSectionsPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSectionsPagerAdapter);

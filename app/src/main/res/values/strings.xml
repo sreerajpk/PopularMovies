@@ -21,5 +21,8 @@
     <string name="overview">Overview</string>
     <string name="images">Images</string>
     <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
+    <string name="show_more">Show More</string>
+    <string name="show_less">Show Less</string>
 
 </resources>

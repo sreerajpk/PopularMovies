@@ -10,6 +10,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -39,15 +40,19 @@ import com.sreeraj.popularmovies.R;
 import com.sreeraj.popularmovies.adapters.PMImagesViewPagerAdapter;
 import com.sreeraj.popularmovies.api.PMImagesApi;
 import com.sreeraj.popularmovies.api.PMMoviesApi;
+import com.sreeraj.popularmovies.api.PMReviewsApi;
 import com.sreeraj.popularmovies.api.PMVideoApi;
 import com.sreeraj.popularmovies.api.response.ImagesResponseBean;
+import com.sreeraj.popularmovies.api.response.ReviewsResponseBean;
 import com.sreeraj.popularmovies.api.response.VideoResponseBean;
 import com.sreeraj.popularmovies.app.PMConstants;
+import com.sreeraj.popularmovies.app.PopularMoviesApplication;
 import com.sreeraj.popularmovies.events.FailureEvent;
 import com.sreeraj.popularmovies.models.Genre;
 import com.sreeraj.popularmovies.models.Image;
 import com.sreeraj.popularmovies.models.Movie;
 import com.sreeraj.popularmovies.models.MovieGeneral;
+import com.sreeraj.popularmovies.models.Review;
 import com.sreeraj.popularmovies.models.Video;
 import com.sreeraj.popularmovies.utils.Utils;
 
@@ -63,7 +68,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by Sreeraj on 5/4/16.
  */
-public class PMMovieDetailsFragment extends Fragment {
+public class PMMovieDetailsFragment extends Fragment implements View.OnClickListener {
 
     private static final double COLOR_DARKENING_FRACTION = 0.85;
     private static final String RATING_OUT_OF = "/10";
@@ -113,12 +118,20 @@ public class PMMovieDetailsFragment extends Fragment {
     ViewPager videosViewpager;
     @Bind(R.id.number_of_videos)
     TextView numberOfVideos;
+    @Bind(R.id.reviews_card)
+    CardView reviewsCard;
+    @Bind(R.id.number_of_reviews)
+    TextView numberOfReviews;
+    @Bind(R.id.review_detail_container)
+    LinearLayout reviewDetailContainer;
     @Bind(R.id.fab)
     FloatingActionButton fab;
+    private String posterPath;
     private MovieGeneral movieGeneral;
     private Movie movie;
     private VideoResponseBean videoResponseBean;
     private ImagesResponseBean imagesResponseBean;
+    private ReviewsResponseBean reviewsResponseBean;
     private View view;
 
     @Nullable
@@ -133,8 +146,10 @@ public class PMMovieDetailsFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (!PopularMoviesApplication.isTwoPane()) {
+            if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
         }
 
         movieGeneral = new MovieGeneral();
@@ -150,18 +165,7 @@ public class PMMovieDetailsFragment extends Fragment {
             posterImage.setVisibility(View.VISIBLE);
             fetchMovieDetails();
         }
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fab.setSelected(!fab.isSelected());
-                movieGeneral.setIsFavourite(fab.isSelected());
-                if (fab.isSelected()) {
-                    // Code to store the movie as favourite in db
-                } else {
-                    // Code to remove the movie from favourite db
-                }
-            }
-        });
+        fab.setOnClickListener(this);
     }
 
     private void restoreDataFromSavedInstanceState(Bundle savedInstanceState) {
@@ -205,10 +209,16 @@ public class PMMovieDetailsFragment extends Fragment {
 
                                     @Override
                                     public void onGenerated(Palette palette) {
-                                        setToolbarAndStatusBarColors(palette);
+                                        if (PopularMoviesApplication.isTwoPane()) {
+                                            collapsingToolbar.setContentScrimColor(ContextCompat.getColor(getActivity(), android.R.color.white));
+                                            collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(getActivity(), android.R.color.black));
+                                        } else {
+                                            setToolbarAndStatusBarColors(palette);
+                                        }
                                     }
                                 });
                                 return false;
+
                             }
                         })
                         .into(posterImage);
@@ -217,20 +227,13 @@ public class PMMovieDetailsFragment extends Fragment {
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(movieGeneral.getOriginalTitle());
             }
             if (movieGeneral.getPosterPath() != null && !movieGeneral.getPosterPath().isEmpty()) {
-                final String posterPath = movieGeneral.getPosterPath();
+                posterPath = movieGeneral.getPosterPath();
                 Glide.with(this).load(PMConstants.IMAGE_BASE_URL + posterPath)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.color.lighter_gray)
                         .error(R.drawable.ic_launcher)
                         .into(thumbImage);
-                thumbImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final DialogFragment moviePosterDialog = PMMoviePosterDialogFragment.newInstance(PMConstants.IMAGE_BASE_URL
-                                + posterPath, movieGeneral.getOriginalTitle());
-                        moviePosterDialog.show(getActivity().getSupportFragmentManager(), MOVIE_POSTER);
-                    }
-                });
+                thumbImage.setOnClickListener(this);
             }
             if (movieGeneral.getOverview() != null && !movieGeneral.getOverview().isEmpty()) {
                 synopsis.setText(movieGeneral.getOverview());
@@ -319,6 +322,9 @@ public class PMMovieDetailsFragment extends Fragment {
 
             PMImagesApi imagesApi = new PMImagesApi();
             imagesApi.getImages(movieGeneral.getId(), getString(R.string.api_key));
+
+            PMReviewsApi reviewsApi = new PMReviewsApi();
+            reviewsApi.getReviews(movieGeneral.getId(), getString(R.string.api_key));
         }
     }
 
@@ -365,8 +371,8 @@ public class PMMovieDetailsFragment extends Fragment {
         EventBus.getDefault().removeStickyEvent(bean);
     }
 
-    public void setVideoList(VideoResponseBean videoResponseBean) {
-        this.videoResponseBean = videoResponseBean;
+    public void setVideoList(VideoResponseBean bean) {
+        videoResponseBean = bean;
         List<String> thumbImageUrls = new ArrayList<>();
         List<String> videoUrls = new ArrayList<>();
         numberOfVideos.setText(String.valueOf(videoResponseBean.getResults().size()));
@@ -401,8 +407,8 @@ public class PMMovieDetailsFragment extends Fragment {
         EventBus.getDefault().removeStickyEvent(bean);
     }
 
-    public void setImagesDisplay(final ImagesResponseBean imagesResponseBean) {
-        this.imagesResponseBean = imagesResponseBean;
+    public void setImagesDisplay(ImagesResponseBean bean) {
+        imagesResponseBean = bean;
         List<String> imageUrls = new ArrayList<>();
         imagesViewpager.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -424,6 +430,60 @@ public class PMMovieDetailsFragment extends Fragment {
         imagesViewpager.setAdapter(adapter);
         imagesViewpager.setPageMargin(getResources().getDimensionPixelSize(R.dimen.padding_small));
         imagesCard.setVisibility(View.VISIBLE);
+    }
+
+    public void onEvent(ReviewsResponseBean bean) {
+        if (movieGeneral.getId() == bean.getId()) {
+            if (bean.getResults().size() > 0) {
+                setReviewsDisplay(bean);
+            } else {
+                //TODO Check if needed or not
+                reviewsCard.setVisibility(View.VISIBLE);
+                numberOfReviews.setText(String.valueOf(0));
+            }
+        }
+        EventBus.getDefault().removeStickyEvent(bean);
+    }
+
+    private void setReviewsDisplay(ReviewsResponseBean bean) {
+        reviewsResponseBean = bean;
+        reviewDetailContainer.removeAllViews();
+        reviewDetailContainer.setDividerPadding(getResources().getDimensionPixelSize(R.dimen.padding_small));
+        for (Review review : reviewsResponseBean.getResults()) {
+            LinearLayout container = (LinearLayout) View.inflate(getActivity(), R.layout.review, null);
+            TextView reviewAuthor = (TextView) container.findViewById(R.id.review_author);
+            TextView reviewContent = (TextView) container.findViewById(R.id.review_content);
+            TextView showMore = (TextView) container.findViewById(R.id.show_more);
+            reviewAuthor.setText(review.getAuthor());
+            reviewContent.setText(review.getContent());
+            reviewContent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    if (reviewContent.getMaxLines() == 5) {
+//                        reviewContent.setMaxLines(500);
+//                        showMore.setText(R.string.show_less);
+//                    } else {
+//                        reviewContent.setMaxLines(5);
+//                        showMore.setText(R.string.show_more);
+//                    }
+                }
+            });
+            showMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    if (reviewContent.getMaxLines() == 5) {
+//                        reviewContent.setMaxLines(500);
+//                        showMore.setText(R.string.show_less);
+//                    } else {
+//                        reviewContent.setMaxLines(5);
+//                        showMore.setText(R.string.show_more);
+//                    }
+                }
+            });
+            reviewDetailContainer.addView(container);
+        }
+        numberOfReviews.setText(String.valueOf(reviewsResponseBean.getResults().size()));
+        reviewsCard.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -469,5 +529,43 @@ public class PMMovieDetailsFragment extends Fragment {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fab:
+                fab.setSelected(!fab.isSelected());
+                movieGeneral.setIsFavourite(fab.isSelected());
+                if (fab.isSelected()) {
+                    // Code to store the movie as favourite in db
+                } else {
+                    // Code to remove the movie from favourite db
+                }
+                break;
+            case R.id.thumb_image:
+                final DialogFragment moviePosterDialog = PMMoviePosterDialogFragment.newInstance(PMConstants.IMAGE_BASE_URL
+                        + posterPath, movieGeneral.getOriginalTitle());
+                moviePosterDialog.show(getActivity().getSupportFragmentManager(), MOVIE_POSTER);
+                break;
+
+            case R.id.review_content:
+                showFullOrLessReview();
+                break;
+            case R.id.show_more:
+                showFullOrLessReview();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void showFullOrLessReview() {
+        TextView review = (TextView) view;
+        if (review.getMaxLines() == 5) {
+            review.setMaxLines(500);
+        } else {
+            review.setMaxLines(5);
+        }
     }
 }

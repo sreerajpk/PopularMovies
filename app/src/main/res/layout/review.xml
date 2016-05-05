@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/review_author"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Author"
+        android:textSize="@dimen/text_medium"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/review_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_xs"
+        android:ellipsize="end"
+        android:maxLines="5"
+        android:text="Conacuas dfsfcszdfs fsfsfs fs f sfs fs f s f sf s f s f s vf vfvfvdvdvd dvd vd fv df v df v dvjhvdjfvgudyvgdefvjd jkvkbjdkjvbkdfkjvjkdkvjkdvj kdjkvjkdjvdbjvdjbkvjdjkvjdjvjkdjk   vjkdjvkdjvjdjkbvjkdjvdbjkvbjkdbjkv"
+        android:textSize="@dimen/text_small"
+        android:textStyle="normal"/>
+
+    <TextView
+        android:id="@+id/show_more"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_xs"
+        android:gravity="center"
+        android:text="@string/show_more"
+        android:textColor="@color/colorPrimary"/>
+
+</LinearLayout>

@@ -1,6 +1,7 @@
 package com.sreeraj.popularmovies.adapters;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +12,15 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.sreeraj.popularmovies.R;
+import com.sreeraj.popularmovies.activities.PMMainActivity;
 import com.sreeraj.popularmovies.app.PMConstants;
+import com.sreeraj.popularmovies.app.PopularMoviesApplication;
 import com.sreeraj.popularmovies.events.MoviesSelectionEvent;
+import com.sreeraj.popularmovies.fragments.PMMovieDetailsFragment;
 import com.sreeraj.popularmovies.models.MovieGeneral;
 import com.sreeraj.popularmovies.views.PMImageView;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +78,7 @@ public class PMMoviesGridAdapter extends RecyclerView.Adapter {
                     .load(PMConstants.IMAGE_BASE_URL + movieList.get(position).getPosterPath())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.color.lighter_gray)
-                    .error(R.drawable.ic_launcher)
+                    .error(android.R.drawable.alert_dark_frame)
                     .into(((MovieViewHolder) holder).image);
             ((MovieViewHolder) holder).name.setText(movieList.get(position).getTitle());
         } else {
@@ -115,9 +121,19 @@ public class PMMoviesGridAdapter extends RecyclerView.Adapter {
 
         @Override
         public void onClick(View v) {
-            MoviesSelectionEvent event = new MoviesSelectionEvent(movieList.get(getLayoutPosition()),
-                    v.findViewById(R.id.movie_image), movieListSortType);
-            EventBus.getDefault().post(event);
+            if (PopularMoviesApplication.isTwoPane()) {
+                Bundle arguments = new Bundle();
+                arguments.putParcelable(PMConstants.MOVIE_GENERAL, Parcels.wrap(movieList.get(getLayoutPosition())));
+                PMMovieDetailsFragment fragment = new PMMovieDetailsFragment();
+                fragment.setArguments(arguments);
+                ((PMMainActivity) context).getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.movie_detail_container, fragment)
+                        .commit();
+            } else {
+                MoviesSelectionEvent event = new MoviesSelectionEvent(movieList.get(getLayoutPosition()),
+                        v.findViewById(R.id.movie_image), movieListSortType);
+                EventBus.getDefault().post(event);
+            }
         }
     }
 
@@ -129,5 +145,4 @@ public class PMMoviesGridAdapter extends RecyclerView.Adapter {
             progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
         }
     }
-
 }

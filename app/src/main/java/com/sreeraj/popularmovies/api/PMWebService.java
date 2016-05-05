@@ -3,6 +3,7 @@ package com.sreeraj.popularmovies.api;
 
 import com.sreeraj.popularmovies.api.response.ImagesResponseBean;
 import com.sreeraj.popularmovies.api.response.MovieListResponseBean;
+import com.sreeraj.popularmovies.api.response.ReviewsResponseBean;
 import com.sreeraj.popularmovies.api.response.VideoResponseBean;
 import com.sreeraj.popularmovies.models.Movie;
 
@@ -33,4 +34,7 @@ public interface PMWebService {
 
     @GET("{id}/images")
     Call<ImagesResponseBean> getImages(@Path("id") int id, @Query("api_key") String apiKey);
+
+    @GET("{id}/reviews")
+    Call<ReviewsResponseBean> getReviews(@Path("id") int id, @Query("api_key") String apiKey);
 }

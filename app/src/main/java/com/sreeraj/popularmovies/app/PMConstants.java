@@ -7,7 +7,7 @@ package com.sreeraj.popularmovies.app;
 public class PMConstants {
 
     public static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
-    public static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w500";
+    public static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w1000";
     public static final String VIDEO_BASE_URL = "https://www.youtube.com/watch?v=";
     public static final String VIDEO_THUMB_IMAGE_BASE_URL = "http://img.youtube.com/vi/%1$s/0.jpg";
     public static final String API_KEY = "api_key";

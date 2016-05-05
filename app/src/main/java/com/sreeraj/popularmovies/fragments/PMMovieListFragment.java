@@ -224,6 +224,7 @@ public class PMMovieListFragment extends Fragment {
 
     private void fetchMovieList() {
         if (Utils.isNetworkAvailable(context)) {
+            emptyView.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.VISIBLE);
             PMMoviesApi moviesApi = new PMMoviesApi();
             Map<String, String> options = new HashMap<>();
