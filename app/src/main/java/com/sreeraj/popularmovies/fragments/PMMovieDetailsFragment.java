@@ -440,6 +440,10 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
                 //TODO Check if needed or not
                 reviewsCard.setVisibility(View.VISIBLE);
                 numberOfReviews.setText(String.valueOf(0));
+                TextView emptyText = new TextView(getActivity());
+                emptyText.setText(R.string.no_reviews_yet);
+                reviewDetailContainer.removeAllViews();
+                reviewDetailContainer.addView(emptyText);
             }
         }
         EventBus.getDefault().removeStickyEvent(bean);
@@ -448,36 +452,27 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
     private void setReviewsDisplay(ReviewsResponseBean bean) {
         reviewsResponseBean = bean;
         reviewDetailContainer.removeAllViews();
-        reviewDetailContainer.setDividerPadding(getResources().getDimensionPixelSize(R.dimen.padding_small));
+        boolean first = true;
         for (Review review : reviewsResponseBean.getResults()) {
             LinearLayout container = (LinearLayout) View.inflate(getActivity(), R.layout.review, null);
+            if (first) {
+                first = false;
+            } else {
+                View separator = container.findViewById(R.id.separator);
+                separator.setVisibility(View.VISIBLE);
+            }
             TextView reviewAuthor = (TextView) container.findViewById(R.id.review_author);
-            TextView reviewContent = (TextView) container.findViewById(R.id.review_content);
-            TextView showMore = (TextView) container.findViewById(R.id.show_more);
+            final TextView reviewContent = (TextView) container.findViewById(R.id.review_content);
             reviewAuthor.setText(review.getAuthor());
             reviewContent.setText(review.getContent());
             reviewContent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    if (reviewContent.getMaxLines() == 5) {
-//                        reviewContent.setMaxLines(500);
-//                        showMore.setText(R.string.show_less);
-//                    } else {
-//                        reviewContent.setMaxLines(5);
-//                        showMore.setText(R.string.show_more);
-//                    }
-                }
-            });
-            showMore.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-//                    if (reviewContent.getMaxLines() == 5) {
-//                        reviewContent.setMaxLines(500);
-//                        showMore.setText(R.string.show_less);
-//                    } else {
-//                        reviewContent.setMaxLines(5);
-//                        showMore.setText(R.string.show_more);
-//                    }
+                    if (reviewContent.getMaxLines() == 5) {
+                        reviewContent.setMaxLines(500);
+                    } else {
+                        reviewContent.setMaxLines(5);
+                    }
                 }
             });
             reviewDetailContainer.addView(container);
@@ -548,24 +543,8 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
                         + posterPath, movieGeneral.getOriginalTitle());
                 moviePosterDialog.show(getActivity().getSupportFragmentManager(), MOVIE_POSTER);
                 break;
-
-            case R.id.review_content:
-                showFullOrLessReview();
-                break;
-            case R.id.show_more:
-                showFullOrLessReview();
-                break;
             default:
                 break;
-        }
-    }
-
-    private void showFullOrLessReview() {
-        TextView review = (TextView) view;
-        if (review.getMaxLines() == 5) {
-            review.setMaxLines(500);
-        } else {
-            review.setMaxLines(5);
         }
     }
 }

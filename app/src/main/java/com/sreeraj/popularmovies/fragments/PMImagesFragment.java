@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.sreeraj.popularmovies.R;
-import com.sreeraj.popularmovies.activities.PMImagesViewPagerActivity;
 import com.sreeraj.popularmovies.app.PMConstants;
 
 import butterknife.Bind;
@@ -84,9 +83,9 @@ public class PMImagesFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (type.equals(PMConstants.IMAGES)) {
-                    Bundle bundle = null;
-                    Intent intent = new Intent(getActivity(), PMImagesViewPagerActivity.class);
-                    getActivity().startActivityFromFragment(PMImagesFragment.this, intent, REQUEST_CODE);
+                    //Bundle bundle = null;
+                    //Intent intent = new Intent(getActivity(), PMImagesViewPagerActivity.class);
+                    //getActivity().startActivityFromFragment(PMImagesFragment.this, intent, REQUEST_CODE);
                 } else {
                     //Redirect to Youtube to play video
                     Intent playVideoIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl));

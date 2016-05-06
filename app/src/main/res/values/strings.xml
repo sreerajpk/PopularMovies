@@ -24,5 +24,6 @@
     <string name="reviews">Reviews</string>
     <string name="show_more">Show More</string>
     <string name="show_less">Show Less</string>
+    <string name="no_reviews_yet">No reviews yet</string>
 
 </resources>
