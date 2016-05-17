@@ -14,7 +14,7 @@ import retrofit2.Response;
  */
 public class PMReviewsApi extends PMBaseApi {
 
-    public void getReviews(int id, String apiKey) {
+    public void getReviews(long id, String apiKey) {
         Call<ReviewsResponseBean> call = service.getReviews(id, apiKey);
         call.enqueue(new Callback<ReviewsResponseBean>() {
             @Override

@@ -49,7 +49,7 @@ public class PMMoviesApi extends PMBaseApi {
         });
     }
 
-    public void getMovieDetails(int id, String apiKey) {
+    public void getMovieDetails(long id, String apiKey) {
         Call<Movie> call = service.getMovieDetails(id, apiKey);
         call.enqueue(new Callback<Movie>() {
             @Override

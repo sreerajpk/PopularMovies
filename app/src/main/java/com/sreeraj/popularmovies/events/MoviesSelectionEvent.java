@@ -2,24 +2,24 @@ package com.sreeraj.popularmovies.events;
 
 import android.view.View;
 
-import com.sreeraj.popularmovies.models.MovieGeneral;
+import com.sreeraj.popularmovies.models.MovieBasicDetails;
 
 /**
  * Events which handles movie selection from grid.
  */
 public class MoviesSelectionEvent {
 
-    private MovieGeneral selectedMovie;
+    private MovieBasicDetails selectedMovie;
     private View view;
     private int movieListSortType;
 
-    public MoviesSelectionEvent(MovieGeneral selectedMovie, View view, int movieListSortType) {
+    public MoviesSelectionEvent(MovieBasicDetails selectedMovie, View view, int movieListSortType) {
         this.selectedMovie = selectedMovie;
         this.view = view;
         this.movieListSortType = movieListSortType;
     }
 
-    public MovieGeneral getSelectedMovie() {
+    public MovieBasicDetails getSelectedMovie() {
         return selectedMovie;
     }
 

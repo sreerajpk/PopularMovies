@@ -18,7 +18,7 @@ public class Movie {
     public String budget;
     public List<Genre> genres;
     public String homepage;
-    public int id;
+    public long id;
     @SerializedName("imdb_id")
     public String imdbId;
     @SerializedName("original_language")
@@ -66,7 +66,7 @@ public class Movie {
         return homepage;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

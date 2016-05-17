@@ -1,13 +1,19 @@
 package com.sreeraj.popularmovies.fragments;
 
 import android.animation.Animator;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -47,11 +53,12 @@ import com.sreeraj.popularmovies.api.response.ReviewsResponseBean;
 import com.sreeraj.popularmovies.api.response.VideoResponseBean;
 import com.sreeraj.popularmovies.app.PMConstants;
 import com.sreeraj.popularmovies.app.PopularMoviesApplication;
+import com.sreeraj.popularmovies.database.MovieContract;
 import com.sreeraj.popularmovies.events.FailureEvent;
 import com.sreeraj.popularmovies.models.Genre;
 import com.sreeraj.popularmovies.models.Image;
 import com.sreeraj.popularmovies.models.Movie;
-import com.sreeraj.popularmovies.models.MovieGeneral;
+import com.sreeraj.popularmovies.models.MovieBasicDetails;
 import com.sreeraj.popularmovies.models.Review;
 import com.sreeraj.popularmovies.models.Video;
 import com.sreeraj.popularmovies.utils.Utils;
@@ -127,12 +134,14 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
     @Bind(R.id.fab)
     FloatingActionButton fab;
     private String posterPath;
-    private MovieGeneral movieGeneral;
+    private MovieBasicDetails movieBasicDetails;
     private Movie movie;
     private VideoResponseBean videoResponseBean;
     private ImagesResponseBean imagesResponseBean;
     private ReviewsResponseBean reviewsResponseBean;
     private View view;
+    private ContentValues values;
+    private boolean isFavourite;
 
     @Nullable
     @Override
@@ -152,10 +161,10 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
             }
         }
 
-        movieGeneral = new MovieGeneral();
+        movieBasicDetails = new MovieBasicDetails();
         if (getArguments() != null) {
             Bundle bundle = getArguments();
-            movieGeneral = Parcels.unwrap(bundle.getParcelable(PMConstants.MOVIE_GENERAL));
+            movieBasicDetails = Parcels.unwrap(bundle.getParcelable(PMConstants.MOVIE_GENERAL));
         }
         restoreDataFromSavedInstanceState(savedInstanceState);
         setData();
@@ -166,11 +175,12 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
             fetchMovieDetails();
         }
         fab.setOnClickListener(this);
+        createContentValues();
     }
 
     private void restoreDataFromSavedInstanceState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            movieGeneral = Parcels.unwrap(savedInstanceState.getParcelable(PMConstants.MOVIE_GENERAL));
+            movieBasicDetails = Parcels.unwrap(savedInstanceState.getParcelable(PMConstants.MOVIE_GENERAL));
             movie = Parcels.unwrap(savedInstanceState.getParcelable(MOVIE));
             if (movie != null) {
                 setMovieDetails(movie);
@@ -187,9 +197,9 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
     }
 
     private void setData() {
-        if (movieGeneral != null) {
-            if (movieGeneral.getBackdropPath() != null && !movieGeneral.getBackdropPath().isEmpty()) {
-                Glide.with(this).load(PMConstants.IMAGE_BASE_URL + movieGeneral.getBackdropPath())
+        if (movieBasicDetails != null) {
+            if (movieBasicDetails.getBackdropPath() != null && !movieBasicDetails.getBackdropPath().isEmpty()) {
+                Glide.with(this).load(PMConstants.IMAGE_BASE_URL + movieBasicDetails.getBackdropPath())
                         .asBitmap()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.color.lighter_gray)
@@ -223,11 +233,11 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
                         })
                         .into(posterImage);
             }
-            if (movieGeneral.getOriginalTitle() != null && ((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(movieGeneral.getOriginalTitle());
+            if (movieBasicDetails.getOriginalTitle() != null && ((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(movieBasicDetails.getOriginalTitle());
             }
-            if (movieGeneral.getPosterPath() != null && !movieGeneral.getPosterPath().isEmpty()) {
-                posterPath = movieGeneral.getPosterPath();
+            if (movieBasicDetails.getPosterPath() != null && !movieBasicDetails.getPosterPath().isEmpty()) {
+                posterPath = movieBasicDetails.getPosterPath();
                 Glide.with(this).load(PMConstants.IMAGE_BASE_URL + posterPath)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.color.lighter_gray)
@@ -235,17 +245,16 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
                         .into(thumbImage);
                 thumbImage.setOnClickListener(this);
             }
-            if (movieGeneral.getOverview() != null && !movieGeneral.getOverview().isEmpty()) {
-                synopsis.setText(movieGeneral.getOverview());
+            if (movieBasicDetails.getOverview() != null && !movieBasicDetails.getOverview().isEmpty()) {
+                synopsis.setText(movieBasicDetails.getOverview());
                 overviewCard.setVisibility(View.VISIBLE);
             }
-            String ratingString = "<b>" + movieGeneral.getVoteAverage() + "</b> " + RATING_OUT_OF;
+            String ratingString = "<b>" + movieBasicDetails.getVoteAverage() + "</b> " + RATING_OUT_OF;
             userRating.setText(Html.fromHtml(ratingString));
-            voteCount.setText(String.valueOf(movieGeneral.getVoteCount()));
-            if (movieGeneral.getReleaseDate() != null && !movieGeneral.getReleaseDate().isEmpty()) {
-                releaseDate.setText(movieGeneral.getReleaseDate());
+            voteCount.setText(String.valueOf(movieBasicDetails.getVoteCount()));
+            if (movieBasicDetails.getReleaseDate() != null && !movieBasicDetails.getReleaseDate().isEmpty()) {
+                releaseDate.setText(movieBasicDetails.getReleaseDate());
             }
-            fab.setSelected(movieGeneral.isFavourite());
         }
     }
 
@@ -258,13 +267,15 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
             int g = Color.green(colorPrimary);
             int colorPrimaryDark = Color.rgb((int) (r * COLOR_DARKENING_FRACTION),
                     (int) (g * COLOR_DARKENING_FRACTION), (int) (b * COLOR_DARKENING_FRACTION));
-            Window window = getActivity().getWindow();
-            // clear FLAG_TRANSLUCENT_STATUS flag:
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            // finally change the color
-            window.setStatusBarColor(colorPrimaryDark);
+            if (getActivity() != null) {
+                Window window = getActivity().getWindow();
+                // clear FLAG_TRANSLUCENT_STATUS flag:
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                // finally change the color
+                window.setStatusBarColor(colorPrimaryDark);
+            }
         }
     }
 
@@ -315,21 +326,21 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
     private void fetchMovieDetails() {
         if (Utils.isNetworkAvailable(getActivity())) {
             PMMoviesApi moviesApi = new PMMoviesApi();
-            moviesApi.getMovieDetails(movieGeneral.getId(), getString(R.string.api_key));
+            moviesApi.getMovieDetails(movieBasicDetails.getId(), getString(R.string.api_key));
 
             PMVideoApi videoApi = new PMVideoApi();
-            videoApi.getVideoDetails(movieGeneral.getId(), getString(R.string.api_key));
+            videoApi.getVideoDetails(movieBasicDetails.getId(), getString(R.string.api_key));
 
             PMImagesApi imagesApi = new PMImagesApi();
-            imagesApi.getImages(movieGeneral.getId(), getString(R.string.api_key));
+            imagesApi.getImages(movieBasicDetails.getId(), getString(R.string.api_key));
 
             PMReviewsApi reviewsApi = new PMReviewsApi();
-            reviewsApi.getReviews(movieGeneral.getId(), getString(R.string.api_key));
+            reviewsApi.getReviews(movieBasicDetails.getId(), getString(R.string.api_key));
         }
     }
 
     public void onEvent(Movie movie) {
-        if (this.movieGeneral.getId() == movie.getId()) {
+        if (this.movieBasicDetails.getId() == movie.getId()) {
             setMovieDetails(movie);
         }
         EventBus.getDefault().removeStickyEvent(movie);
@@ -363,7 +374,7 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
     }
 
     public void onEvent(VideoResponseBean bean) {
-        if (movieGeneral.getId() == bean.getId()) {
+        if (movieBasicDetails.getId() == bean.getId()) {
             if (bean.getResults().size() > 0) {
                 setVideoList(bean);
             }
@@ -399,7 +410,7 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
     }
 
     public void onEvent(ImagesResponseBean bean) {
-        if (movieGeneral.getId() == bean.getId()) {
+        if (movieBasicDetails.getId() == bean.getId()) {
             if (bean.getBackdrops().size() > 0) {
                 setImagesDisplay(bean);
             }
@@ -433,7 +444,7 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
     }
 
     public void onEvent(ReviewsResponseBean bean) {
-        if (movieGeneral.getId() == bean.getId()) {
+        if (movieBasicDetails.getId() == bean.getId()) {
             if (bean.getResults().size() > 0) {
                 setReviewsDisplay(bean);
             } else {
@@ -499,7 +510,7 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(PMConstants.MOVIE_GENERAL, Parcels.wrap(movieGeneral));
+        outState.putParcelable(PMConstants.MOVIE_GENERAL, Parcels.wrap(movieBasicDetails));
         storeDetailsInSavedInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
@@ -530,21 +541,84 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab:
-                fab.setSelected(!fab.isSelected());
-                movieGeneral.setIsFavourite(fab.isSelected());
-                if (fab.isSelected()) {
-                    // Code to store the movie as favourite in db
-                } else {
-                    // Code to remove the movie from favourite db
-                }
+                setFavourites();
                 break;
+//                movieBasicDetails.setIsFavourite(fab.isSelected());
+//                if (fab.isSelected()) {
+//                    // Code to store the movie as favourite in db
+//                } else {
+//                    // Code to remove the movie from favourite db
+//                }
             case R.id.thumb_image:
                 final DialogFragment moviePosterDialog = PMMoviePosterDialogFragment.newInstance(PMConstants.IMAGE_BASE_URL
-                        + posterPath, movieGeneral.getOriginalTitle());
+                        + posterPath, movieBasicDetails.getOriginalTitle());
                 moviePosterDialog.show(getActivity().getSupportFragmentManager(), MOVIE_POSTER);
                 break;
             default:
                 break;
         }
+    }
+
+    private void createContentValues() {
+        values = new ContentValues();
+        if (movieBasicDetails.getPosterPath() == null) {
+            movieBasicDetails.setPosterPath("No url found");
+        }
+        if (movieBasicDetails.getBackdropPath() == null) {
+            movieBasicDetails.setBackdropPath("No url found");
+        }
+
+        values.put(MovieContract.Movie.COLUMN_TITLE, movieBasicDetails.getTitle());
+        values.put(MovieContract.Movie.COLUMN_POSTER_URL, movieBasicDetails.getPosterPath());
+        values.put(MovieContract.Movie.COLUMN_BACK_DROP_URL, movieBasicDetails.getBackdropPath());
+        values.put(MovieContract.Movie.COLUMN_ORIGINAL_TITLE, movieBasicDetails.getOriginalTitle());
+        values.put(MovieContract.Movie.COLUMN_PLOT, movieBasicDetails.getOverview());
+        values.put(MovieContract.Movie.COLUMN_RATING, movieBasicDetails.getVoteAverage());
+        values.put(MovieContract.Movie.COLUMN_RELEASE_DATE, movieBasicDetails.getReleaseDate());
+        values.put(MovieContract.Movie.COLUMN_MOVIE_ID, movieBasicDetails.getId());
+        values.put(MovieContract.Movie.COLUMN_MOVIE_VOTE_COUNT, movieBasicDetails.getVoteCount());
+        //values.put(MovieContract.Movie.COLUMN_GENRE_ID, CommonUtil.convertArrayToString(movieBasicDetails.getGenreId()));
+
+        Cursor c = getContext().getContentResolver().
+                query(MovieContract.Movie.CONTENT_URI,
+                        new String[]{MovieContract.Movie.COLUMN_MOVIE_ID},
+                        MovieContract.Movie.COLUMN_MOVIE_ID + "= ? ",
+                        new String[]{String.valueOf(movieBasicDetails.getId())},
+                        null);
+
+        if (c != null) {
+            if (c.getCount() > 0) {
+                isFavourite = true;
+                fab.setSelected(true);
+            } else {
+                isFavourite = false;
+                fab.setSelected(false);
+            }
+            c.close();
+        }
+    }
+
+    private void setFavourites() {
+        fab.setSelected(!fab.isSelected());
+        if (isFavourite) {
+            isFavourite = false;
+            int rowDeleted = getContext().getContentResolver().delete(MovieContract.Movie.CONTENT_URI,
+                    MovieContract.Movie.COLUMN_MOVIE_ID + "= ?", new String[]{String.valueOf(movieBasicDetails.getId())});
+            if (rowDeleted > 0) {
+                showSnackBar("Removed " + movieBasicDetails.getTitle() + " from favourites");
+            }
+        } else {
+            isFavourite = true;
+            Uri rowUri = getContext().getContentResolver().insert(MovieContract.Movie.CONTENT_URI, values);
+            long rowId = ContentUris.parseId(rowUri);
+            if (rowId > 0) {
+                showSnackBar("Added " + movieBasicDetails.getTitle() + " to favourites");
+            }
+        }
+    }
+
+    private void showSnackBar(@NonNull String message) {
+        Snackbar.make(view.findViewById(R.id.coordinator_layout), message, Snackbar.LENGTH_SHORT)
+                .setAction("Action", null).show();
     }
 }

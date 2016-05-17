@@ -14,7 +14,7 @@ import retrofit2.Response;
  */
 public class PMImagesApi extends PMBaseApi {
 
-    public void getImages(int id, String apiKey) {
+    public void getImages(long id, String apiKey) {
         Call<ImagesResponseBean> call = service.getImages(id, apiKey);
         call.enqueue(new Callback<ImagesResponseBean>() {
             @Override

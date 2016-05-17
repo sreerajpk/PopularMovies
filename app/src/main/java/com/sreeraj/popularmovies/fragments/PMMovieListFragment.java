@@ -2,6 +2,7 @@ package com.sreeraj.popularmovies.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sreeraj.popularmovies.PMSpacesItemDecoration;
@@ -26,11 +28,12 @@ import com.sreeraj.popularmovies.adapters.PMMoviesGridAdapter;
 import com.sreeraj.popularmovies.api.PMMoviesApi;
 import com.sreeraj.popularmovies.api.response.MovieListResponseBean;
 import com.sreeraj.popularmovies.app.PMConstants;
+import com.sreeraj.popularmovies.database.MovieContract;
 import com.sreeraj.popularmovies.events.FailureEvent;
 import com.sreeraj.popularmovies.events.MoviesSelectionEvent;
 import com.sreeraj.popularmovies.events.PopularMoviesEvent;
 import com.sreeraj.popularmovies.events.TopRatedMoviesEvent;
-import com.sreeraj.popularmovies.models.MovieGeneral;
+import com.sreeraj.popularmovies.models.MovieBasicDetails;
 import com.sreeraj.popularmovies.utils.Utils;
 
 import org.parceler.Parcels;
@@ -60,6 +63,8 @@ public class PMMovieListFragment extends Fragment {
     RecyclerView moviesGrid;
     @Bind(R.id.empty_view)
     LinearLayout emptyView;
+    @Bind(R.id.fav_empty)
+    TextView favouritesEmpty;
     @Bind(R.id.retry_button)
     Button retryButton;
     @Bind(R.id.progress_bar)
@@ -67,7 +72,7 @@ public class PMMovieListFragment extends Fragment {
     private Context context;
     private PMMoviesGridAdapter adapter;
     private GridLayoutManager layoutManager;
-    private List<MovieGeneral> movieList;
+    private List<MovieBasicDetails> movieList;
     private int position;
     private boolean restoredState;
     private boolean isLoading;
@@ -84,16 +89,18 @@ public class PMMovieListFragment extends Fragment {
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
-            int visibleItemCount = layoutManager.getChildCount();
-            int totalItemCount = layoutManager.getItemCount();
-            int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+            if (position != PMConstants.FAVOURITES) {
+                int visibleItemCount = layoutManager.getChildCount();
+                int totalItemCount = layoutManager.getItemCount();
+                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
 
-            if (!isLoading && currentPage < totalPages) {
-                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                        && firstVisibleItemPosition >= 0
-                        && totalItemCount >= PMConstants.PAGE_SIZE) {
-                    if (Utils.isNetworkAvailable(getActivity())) {
-                        loadMoreItems();
+                if (!isLoading && currentPage < totalPages) {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                            && firstVisibleItemPosition >= 0
+                            && totalItemCount >= PMConstants.PAGE_SIZE) {
+                        if (Utils.isNetworkAvailable(getActivity())) {
+                            loadMoreItems();
+                        }
                     }
                 }
             }
@@ -126,7 +133,7 @@ public class PMMovieListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
-            List<MovieGeneral> list = Parcels.unwrap(savedInstanceState.getParcelable(MOVIE_LIST));
+            List<MovieBasicDetails> list = Parcels.unwrap(savedInstanceState.getParcelable(MOVIE_LIST));
             if (list != null && list.size() > 0) {
                 movieList = new ArrayList<>();
                 movieList.addAll(list);
@@ -154,7 +161,7 @@ public class PMMovieListFragment extends Fragment {
             fetchMovieList();
         } else {
             if (movieList != null && movieList.size() > 0) {
-                List<MovieGeneral> list = new ArrayList<>();
+                List<MovieBasicDetails> list = new ArrayList<>();
                 list.addAll(movieList);
                 adapter.setList(list);
             }
@@ -215,28 +222,41 @@ public class PMMovieListFragment extends Fragment {
 
 
     private void checkAdapterIsEmpty() {
-        if (adapter.getItemCount() == 0) {
-            emptyView.setVisibility(View.VISIBLE);
+        if (position == PMConstants.FAVOURITES) {
+            if (adapter.getItemCount() == 0) {
+                favouritesEmpty.setVisibility(View.VISIBLE);
+            } else {
+                favouritesEmpty.setVisibility(View.GONE);
+            }
         } else {
-            emptyView.setVisibility(View.GONE);
+            if (adapter.getItemCount() == 0) {
+                emptyView.setVisibility(View.VISIBLE);
+            } else {
+                emptyView.setVisibility(View.GONE);
+            }
         }
     }
 
     private void fetchMovieList() {
-        if (Utils.isNetworkAvailable(context)) {
-            emptyView.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
-            PMMoviesApi moviesApi = new PMMoviesApi();
-            Map<String, String> options = new HashMap<>();
-            options.put(PMConstants.API_KEY, getString(R.string.api_key));
-            if (position == PMConstants.POPULAR) {
-                moviesApi.getPopularMovies(options);
-            } else {
-                moviesApi.getTopRatedMovies(options);
-            }
+        if (position == PMConstants.FAVOURITES) {
+            showFavouriteMovies();
+            progressBar.setVisibility(View.GONE);
         } else {
-            showNetworkAlertSnackBar();
-            emptyView.setVisibility(View.VISIBLE);
+            if (Utils.isNetworkAvailable(context)) {
+                emptyView.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
+                PMMoviesApi moviesApi = new PMMoviesApi();
+                Map<String, String> options = new HashMap<>();
+                options.put(PMConstants.API_KEY, getString(R.string.api_key));
+                if (position == PMConstants.POPULAR) {
+                    moviesApi.getPopularMovies(options);
+                } else if (position == PMConstants.TOP_RATED) {
+                    moviesApi.getTopRatedMovies(options);
+                }
+            } else {
+                showNetworkAlertSnackBar();
+                emptyView.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -267,7 +287,7 @@ public class PMMovieListFragment extends Fragment {
     }
 
     private void setMovieList(MovieListResponseBean bean) {
-        List<MovieGeneral> list = bean.getResults();
+        List<MovieBasicDetails> list = bean.getResults();
         if (adapter.getItemCount() == 0) {
             movieList = list;
             adapter.setList(list);
@@ -306,6 +326,9 @@ public class PMMovieListFragment extends Fragment {
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().registerSticky(this);
         }
+        if (position == PMConstants.FAVOURITES) {
+            showFavouriteMovies();
+        }
     }
 
     @Override
@@ -342,5 +365,33 @@ public class PMMovieListFragment extends Fragment {
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         snackbar.getView().setLayoutParams(layoutParams);
         snackbar.show();
+    }
+
+    /**
+     * show Favourite movies from database
+     */
+    private void showFavouriteMovies() {
+//        mCurrentSortSelection = CAConstants.FAVOURITES;
+        Cursor cursor = getActivity().getContentResolver().query(MovieContract.Movie.CONTENT_URI, null, null, null, MovieContract.Movie._ID + " DESC");
+        ArrayList<MovieBasicDetails> mPosterList = new ArrayList<>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                MovieBasicDetails resultModel = new MovieBasicDetails();
+                resultModel.setTitle(cursor.getString(cursor.getColumnIndex(MovieContract.Movie.COLUMN_TITLE)));
+                resultModel.setPosterPath(cursor.getString(cursor.getColumnIndex(MovieContract.Movie.COLUMN_POSTER_URL)));
+                resultModel.setBackdropPath(cursor.getString(cursor.getColumnIndex(MovieContract.Movie.COLUMN_BACK_DROP_URL)));
+                resultModel.setOriginalTitle(cursor.getString(cursor.getColumnIndex(MovieContract.Movie.COLUMN_ORIGINAL_TITLE)));
+                resultModel.setOverview(cursor.getString(cursor.getColumnIndex(MovieContract.Movie.COLUMN_PLOT)));
+                resultModel.setVoteAverage(cursor.getDouble(cursor.getColumnIndex(MovieContract.Movie.COLUMN_RATING)));
+                resultModel.setReleaseDate(cursor.getString(cursor.getColumnIndex(MovieContract.Movie.COLUMN_RELEASE_DATE)));
+                resultModel.setId(cursor.getLong(cursor.getColumnIndex(MovieContract.Movie.COLUMN_MOVIE_ID)));
+                resultModel.setVoteCount(cursor.getInt(cursor.getColumnIndex(MovieContract.Movie.COLUMN_MOVIE_VOTE_COUNT)));
+                //resultModel.setGenreId(CommonUtil.convertStringToArray(cursor.getString(cursor.getColumnIndex(MovieContract.Movie.COLUMN_GENRE_ID))));
+                mPosterList.add(resultModel);
+            }
+            adapter.setList(mPosterList);
+            //checkAdapterIsEmpty();
+            cursor.close();
+        }
     }
 }

@@ -4,7 +4,6 @@
                 android:layout_height="match_parent"
                 android:gravity="center">
 
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/movies_grid"
         android:layout_width="match_parent"
@@ -14,16 +13,16 @@
     <LinearLayout
         android:id="@+id/empty_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="@dimen/margin_medium"
-        android:gravity="center_horizontal"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/no_movies_found"
             android:textSize="@dimen/text_medium"/>
@@ -39,6 +38,15 @@
             android:textSize="@dimen/text_medium"/>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/fav_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:gravity="center"
+        android:text="@string/add_movies_to_favourites"
+        android:visibility="gone"/>
+
     <ProgressBar
         android:id="@+id/progress_bar"
         style="?android:attr/progressBarStyle"
@@ -46,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/margin_medium"
+        android:layout_marginBottom="@dimen/margin_large"
         android:background="@android:color/transparent"
         android:indeterminate="true"
         android:indeterminateDrawable="@drawable/progressbar_custom"

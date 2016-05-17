@@ -27,14 +27,14 @@ public interface PMWebService {
     Call<MovieListResponseBean> getTopRatedMovies(@QueryMap Map<String, String> options);
 
     @GET("{id}")
-    Call<Movie> getMovieDetails(@Path("id") int id, @Query("api_key") String apiKey);
+    Call<Movie> getMovieDetails(@Path("id") long id, @Query("api_key") String apiKey);
 
     @GET("{id}/videos")
-    Call<VideoResponseBean> getVideoDetails(@Path("id") int id, @Query("api_key") String apiKey);
+    Call<VideoResponseBean> getVideoDetails(@Path("id") long id, @Query("api_key") String apiKey);
 
     @GET("{id}/images")
-    Call<ImagesResponseBean> getImages(@Path("id") int id, @Query("api_key") String apiKey);
+    Call<ImagesResponseBean> getImages(@Path("id") long id, @Query("api_key") String apiKey);
 
     @GET("{id}/reviews")
-    Call<ReviewsResponseBean> getReviews(@Path("id") int id, @Query("api_key") String apiKey);
+    Call<ReviewsResponseBean> getReviews(@Path("id") long id, @Query("api_key") String apiKey);
 }

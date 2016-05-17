@@ -14,7 +14,7 @@ import retrofit2.Response;
  */
 public class PMVideoApi extends PMBaseApi {
 
-    public void getVideoDetails(int id, String apiKey) {
+    public void getVideoDetails(long id, String apiKey) {
         Call<VideoResponseBean> call = service.getVideoDetails(id, apiKey);
         call.enqueue(new Callback<VideoResponseBean>() {
             @Override

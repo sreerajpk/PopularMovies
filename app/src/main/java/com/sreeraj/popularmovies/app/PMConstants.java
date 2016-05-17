@@ -13,6 +13,7 @@ public class PMConstants {
     public static final String API_KEY = "api_key";
     public static final int POPULAR = 1;
     public static final int TOP_RATED = 2;
+    public static final int FAVOURITES = 3;
     public static final String BUNDLE = "bundle";
     public static final String MOVIE_GENERAL = "movie_general";
     public static final int PAGE_SIZE = 20;

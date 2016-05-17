@@ -17,7 +17,7 @@ import com.sreeraj.popularmovies.fragments.PMMovieListFragment;
  */
 public class PMSectionsPagerAdapter extends FragmentStatePagerAdapter {
 
-    private String[] titles = {"POPULAR", "TOP RATED"};
+    private String[] titles = {"POPULAR", "TOP RATED", "FAVOURITES"};
 
     public PMSectionsPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -32,6 +32,8 @@ public class PMSectionsPagerAdapter extends FragmentStatePagerAdapter {
                 return PMMovieListFragment.newInstance(PMConstants.POPULAR);
             case 1:
                 return PMMovieListFragment.newInstance(PMConstants.TOP_RATED);
+            case 2:
+                return PMMovieListFragment.newInstance(PMConstants.FAVOURITES);
             default:
                 break;
         }

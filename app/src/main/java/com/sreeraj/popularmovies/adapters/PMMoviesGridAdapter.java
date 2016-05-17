@@ -17,7 +17,7 @@ import com.sreeraj.popularmovies.app.PMConstants;
 import com.sreeraj.popularmovies.app.PopularMoviesApplication;
 import com.sreeraj.popularmovies.events.MoviesSelectionEvent;
 import com.sreeraj.popularmovies.fragments.PMMovieDetailsFragment;
-import com.sreeraj.popularmovies.models.MovieGeneral;
+import com.sreeraj.popularmovies.models.MovieBasicDetails;
 import com.sreeraj.popularmovies.views.PMImageView;
 
 import org.parceler.Parcels;
@@ -35,7 +35,7 @@ public class PMMoviesGridAdapter extends RecyclerView.Adapter {
     public static final int VIEW_ITEM = 1;
     public static final int VIEW_PROG = 0;
 
-    private List<MovieGeneral> movieList = new ArrayList<>();
+    private List<MovieBasicDetails> movieList = new ArrayList<>();
     private Context context;
     private int movieListSortType;
 
@@ -44,12 +44,13 @@ public class PMMoviesGridAdapter extends RecyclerView.Adapter {
         this.movieListSortType = movieListSortType;
     }
 
-    public void setList(List<MovieGeneral> movieList) {
+    public void setList(List<MovieBasicDetails> movieList) {
+        this.movieList.clear();
         this.movieList.addAll(movieList);
         notifyDataSetChanged();
     }
 
-    public void addMoviesToList(List<MovieGeneral> movieList) {
+    public void addMoviesToList(List<MovieBasicDetails> movieList) {
         int size = getItemCount();
         this.movieList.addAll(movieList);
         notifyItemRangeInserted(size, size + movieList.size() - 1);
@@ -91,7 +92,11 @@ public class PMMoviesGridAdapter extends RecyclerView.Adapter {
         if (movieList.size() == 0) {
             return 0;
         }
-        return movieList.size() + 1;
+        if (movieListSortType == PMConstants.FAVOURITES) {
+            return movieList.size();
+        } else {
+            return movieList.size() + 1;
+        }
     }
 
     @Override
