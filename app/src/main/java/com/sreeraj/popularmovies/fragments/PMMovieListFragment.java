@@ -2,6 +2,7 @@ package com.sreeraj.popularmovies.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,11 +24,13 @@ import android.widget.Toast;
 
 import com.sreeraj.popularmovies.PMSpacesItemDecoration;
 import com.sreeraj.popularmovies.R;
+import com.sreeraj.popularmovies.activities.PMMainActivity;
 import com.sreeraj.popularmovies.activities.PMMovieDetailsActivity;
 import com.sreeraj.popularmovies.adapters.PMMoviesGridAdapter;
 import com.sreeraj.popularmovies.api.PMMoviesApi;
 import com.sreeraj.popularmovies.api.response.MovieListResponseBean;
 import com.sreeraj.popularmovies.app.PMConstants;
+import com.sreeraj.popularmovies.app.PopularMoviesApplication;
 import com.sreeraj.popularmovies.database.MovieContract;
 import com.sreeraj.popularmovies.events.FailureEvent;
 import com.sreeraj.popularmovies.events.MoviesSelectionEvent;
@@ -164,6 +167,7 @@ public class PMMovieListFragment extends Fragment {
                 List<MovieBasicDetails> list = new ArrayList<>();
                 list.addAll(movieList);
                 adapter.setList(list);
+                autoSelectAMovie();
             }
             restoredState = false;
         }
@@ -267,9 +271,11 @@ public class PMMovieListFragment extends Fragment {
             bundle.putParcelable(PMConstants.MOVIE_GENERAL, Parcels.wrap(event.getSelectedMovie()));
             intent.putExtra(PMConstants.BUNDLE, bundle);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation(getActivity(), event.getView(), THUMB_IMAGE_TRANSITION_NAME);
-                getActivity().startActivity(intent, options.toBundle());
+                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    ActivityOptionsCompat options = ActivityOptionsCompat.
+                            makeSceneTransitionAnimation(getActivity(), event.getView(), THUMB_IMAGE_TRANSITION_NAME);
+                    getActivity().startActivity(intent, options.toBundle());
+                }
             } else {
                 startActivity(intent);
             }
@@ -283,6 +289,23 @@ public class PMMovieListFragment extends Fragment {
             //if (apiCallsInProgress == 0) { //If all api call results are delivered as sticky
             EventBus.getDefault().removeStickyEvent(event);
             //}
+            autoSelectAMovie();
+        }
+    }
+
+    private void autoSelectAMovie() {
+        if (position == ((PMMainActivity) getActivity()).getViewPagerSelection()) {
+            if (PopularMoviesApplication.isTwoPane()) {
+                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    Bundle arguments = new Bundle();
+                    arguments.putParcelable(PMConstants.MOVIE_GENERAL, Parcels.wrap(movieList.get(0)));
+                    PMMovieDetailsFragment fragment = new PMMovieDetailsFragment();
+                    fragment.setArguments(arguments);
+                    ((PMMainActivity) context).getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.movie_detail_container, fragment)
+                            .commit();
+                }
+            }
         }
     }
 
@@ -309,6 +332,7 @@ public class PMMovieListFragment extends Fragment {
             //if (apiCallsInProgress == 0) { //If all api call results are delivered as sticky
             EventBus.getDefault().removeStickyEvent(event);
             //}
+            autoSelectAMovie();
         }
     }
 

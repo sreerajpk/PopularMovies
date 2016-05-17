@@ -3,6 +3,7 @@ package com.sreeraj.popularmovies.fragments;
 import android.animation.Animator;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -169,7 +170,9 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
         restoreDataFromSavedInstanceState(savedInstanceState);
         setData();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setSharedElementTransition();
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                setSharedElementTransition();
+            }
         } else {
             posterImage.setVisibility(View.VISIBLE);
             fetchMovieDetails();

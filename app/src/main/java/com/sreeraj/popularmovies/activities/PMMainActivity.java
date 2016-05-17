@@ -45,4 +45,10 @@ public class PMMainActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
         tabLayout.setupWithViewPager(mViewPager);
     }
+
+    public int getViewPagerSelection() {
+        return mViewPager.getCurrentItem();
+    }
+
+
 }
