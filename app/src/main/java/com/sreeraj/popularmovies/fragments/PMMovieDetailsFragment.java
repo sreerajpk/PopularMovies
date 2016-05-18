@@ -222,11 +222,13 @@ public class PMMovieDetailsFragment extends Fragment implements View.OnClickList
 
                                     @Override
                                     public void onGenerated(Palette palette) {
-                                        if (PopularMoviesApplication.isTwoPane()) {
-                                            collapsingToolbar.setContentScrimColor(ContextCompat.getColor(getActivity(), android.R.color.white));
-                                            collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(getActivity(), android.R.color.black));
-                                        } else {
-                                            setToolbarAndStatusBarColors(palette);
+                                        if (getActivity() != null) {
+                                            if (PopularMoviesApplication.isTwoPane()) {
+                                                collapsingToolbar.setContentScrimColor(ContextCompat.getColor(getActivity(), android.R.color.white));
+                                                collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(getActivity(), android.R.color.black));
+                                            } else {
+                                                setToolbarAndStatusBarColors(palette);
+                                            }
                                         }
                                     }
                                 });

@@ -22,8 +22,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
 /**
- * @author albin
- * @date 23/2/16
+ * DBHelper class
  */
 public class MovieDbHelper extends SQLiteOpenHelper {
 
@@ -41,7 +40,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             MovieContract.Movie.COLUMN_RELEASE_DATE + TEXT_NOT_NULL +
             MovieContract.Movie.COLUMN_MOVIE_ID + TEXT_NOT_NULL +
             MovieContract.Movie.COLUMN_MOVIE_VOTE_COUNT + TEXT_NOT_NULL +
-            //MovieContract.Movie.COLUMN_GENRE_ID + TEXT_NOT_NULL +
             "UNIQUE (" + MovieContract.Movie.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
 

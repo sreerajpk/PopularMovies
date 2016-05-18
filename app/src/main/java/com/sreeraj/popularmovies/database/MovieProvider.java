@@ -26,16 +26,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * @author albin
- * @date 23/2/16
+ * Content provider to provide stored favourite movies
  */
 public class MovieProvider extends ContentProvider {
 
     public static final int MOVIE = 100;
     public static final int MOVIE_WITH_ID = 101;
     public static final String UNKNOWN_URI = "Unknown Uri: ";
-
-
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     @Nullable
     private MovieDbHelper mDbHelper;
